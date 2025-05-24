@@ -1,10 +1,27 @@
-from typing import List, Optional
 from datetime import date, datetime
-from pydantic import BaseModel, EmailStr
+from typing import List
+
+from pydantic import BaseModel
+
+from .expense_schema import ExpenseRead
+
 
 class UserBase(BaseModel):
     name: str
-    email: EmailStr
+    email: str
     birthday: date
     is_restricted: bool
     is_admin: bool
+
+
+class UserCreate(UserBase):
+    password: str
+
+
+class UserRead(UserBase):
+    id: int
+    created_at: datetime
+
+
+class UserExpenses(UserRead):
+    expenses: List[ExpenseRead] = []

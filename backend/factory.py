@@ -1,18 +1,10 @@
+from controller.user_controller import router as user_router
 from fastapi import FastAPI
-
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
-
-from config import Config
-
-BASE = declarative_base()
-
-config = Config()
-engine = create_engine(config.SQLALCHEMY_DATABASE_URL, echo=True)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 def create_app():
     app = FastAPI()
+
+    app.include_router(user_router, prefix="/api", tags=["Users"])
+
     return app

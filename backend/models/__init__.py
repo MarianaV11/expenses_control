@@ -1,4 +1,4 @@
-from factory import BASE
+from database import BASE
 
 from .user import User
 from .expense import Expense
