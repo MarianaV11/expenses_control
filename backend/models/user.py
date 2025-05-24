@@ -19,4 +19,6 @@ class User(BASE):
     is_admin = Column(Boolean, nullable=False)
 
     images = relationship("Image", back_populates="user", cascade="all, delete-orphan")
-    expenses = relationship("Expense", back_populates="user", cascade="all, delete-orphan")
+    expenses = relationship(
+        "Expense", back_populates="user", cascade="all, delete-orphan"
+    )

@@ -1,6 +1,7 @@
 from datetime import date, datetime
 from pydantic import BaseModel
 
+
 class ExpenseBase(BaseModel):
     name: str
     value: float

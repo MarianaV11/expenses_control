@@ -4,6 +4,7 @@ from sqlalchemy.sql import func
 
 from models import BASE
 
+
 class Expense(BASE):
     __tablename__ = "expenses"
 
@@ -16,7 +17,6 @@ class Expense(BASE):
     card = Column(String, nullable=False)
     payment_type = Column(String, nullable=False)
 
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False    )
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
     user = relationship("User", back_populates="expenses")
-    

@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 from .expense_schema import ExpenseRead
 
+
 class UserBase(BaseModel):
     name: str
     email: str
@@ -31,10 +32,8 @@ class UserLoginReturn(BaseModel):
 class UserRead(UserBase):
     id: int
     created_at: datetime
-    
-    model_config = {
-        "from_attributes": True
-    }
+
+    model_config = {"from_attributes": True}
 
 
 class UserExpenses(UserRead):

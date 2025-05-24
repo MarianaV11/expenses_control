@@ -3,4 +3,6 @@ repos:
     rev: v0.3.0
     hooks:
       - id: ruff
+        exclude: '^(backend/models/__init__\.py$|backend/alembic/)'
       - id: ruff-format
+        exclude: '^(backend/models/__init__\.py$|backend/alembic/)'

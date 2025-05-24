@@ -33,7 +33,7 @@ def create_user(user_data: UserCreate) -> JSONResponse:
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
-        content={"message": "User created with success!", "id": new_user.id}
+        content={"message": "User created with success!", "id": new_user.id},
     )
 
 

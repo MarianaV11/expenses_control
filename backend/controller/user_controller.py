@@ -4,6 +4,7 @@ from services.user_service import create_user, login
 
 router = APIRouter()
 
+
 @router.post("/users/create")
 def create_user_route(user: UserCreate):
     return create_user(user)
