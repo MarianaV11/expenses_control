@@ -2,7 +2,13 @@ from database import SessionLocal
 from fastapi import HTTPException, status
 from fastapi.responses import JSONResponse
 from models.user import User
-from schemas.user_schema import UserCreate, UserLogin, UserLoginReturn
+from schemas.user_schema import (
+    UserCreate,
+    UserLogin,
+    UserLoginReturn,
+    UserIdentifier,
+    UserBase,
+)
 from utils.auth import create_access_token
 from utils.security import hash_password, verify_password
 
@@ -15,7 +21,7 @@ def create_user(user_data: UserCreate) -> JSONResponse:
     if user:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Already a user created with this e-mail!",
+            detail={"message": "Already a user created with this e-mail!"},
         )
 
     new_user = User(
@@ -47,7 +53,7 @@ def login(user_data: UserLogin) -> UserLoginReturn:
     ):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Wrong password or e-mail!",
+            detail={"message": "Wrong password or e-mail!"},
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -58,3 +64,17 @@ def login(user_data: UserLogin) -> UserLoginReturn:
         access_token=token,
         token_type="bearer",
     )
+
+
+def get_user(user_id: UserIdentifier) -> UserBase:
+    db = SessionLocal()
+
+    user = db.query(User).filter(User.id == user_id.id).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": "Current user not found in our database."},
+        )
+
+    return UserBase.model_validate(user)
