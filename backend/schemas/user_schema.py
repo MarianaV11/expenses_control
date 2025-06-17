@@ -6,6 +6,11 @@ from pydantic import BaseModel
 from .expense_schema import ExpenseRead
 
 
+class UserAuth(BaseModel):
+    token_type: str
+    access_token: str
+
+
 class UserIdentifier(BaseModel):
     id: int
 
@@ -20,8 +25,15 @@ class UserBase(UserIdentifier):
     model_config = {"from_attributes": True}
 
 
-class UserCreate(UserBase):
+class UserCreate(BaseModel):
+    name: str
+    email: str
+    birthday: date
     password: str
+    is_restricted: bool = False
+    is_admin: bool = False
+
+    model_config = {"from_attributes": True}
 
 
 class UserLogin(BaseModel):
@@ -30,8 +42,7 @@ class UserLogin(BaseModel):
 
 
 class UserLoginReturn(UserIdentifier):
-    token_type: str
-    access_token: str
+    auth: UserAuth
 
 
 class UserRead(UserIdentifier):

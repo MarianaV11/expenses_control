@@ -3,7 +3,12 @@ from fastapi import FastAPI
 
 
 def create_app():
-    app = FastAPI()
+    app = FastAPI(
+        title="Finance Control",
+        version="0.1.0",
+        docs_url="/api/docs",
+        description="This is the backend of my personal finance control application. The project was developed for my portfolio, is freely available, and is licensed under the MIT license.",
+    )
 
     app.include_router(user_router, prefix="/api", tags=["Users"])
 

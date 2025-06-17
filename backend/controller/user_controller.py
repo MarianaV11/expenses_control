@@ -1,12 +1,13 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from schemas.user_schema import (
+    UserBase,
     UserCreate,
+    UserIdentifier,
     UserLogin,
     UserLoginReturn,
-    UserBase,
-    UserIdentifier,
 )
-from services.user_service import create_user, login, get_user
+from services.user_service import create_user, get_user, login
+from utils.auth import require_token_valid
 
 router = APIRouter()
 
@@ -22,5 +23,5 @@ def login_user_route(user: UserLogin):
 
 
 @router.get("/users/user", response_model=UserBase)
-def get_user_route(user_id: int):
+def get_user_route(user_id: int, _: None = Depends(require_token_valid)):
     return get_user(UserIdentifier(id=user_id))

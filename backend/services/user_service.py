@@ -3,11 +3,12 @@ from fastapi import HTTPException, status
 from fastapi.responses import JSONResponse
 from models.user import User
 from schemas.user_schema import (
+    UserAuth,
+    UserBase,
     UserCreate,
+    UserIdentifier,
     UserLogin,
     UserLoginReturn,
-    UserIdentifier,
-    UserBase,
 )
 from utils.auth import create_access_token
 from utils.security import hash_password, verify_password
@@ -17,7 +18,7 @@ def create_user(user_data: UserCreate) -> JSONResponse:
     db = SessionLocal()
 
     user = db.query(User).filter(User.email == user_data.email).first()
-    print(user)
+
     if user:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -60,9 +61,7 @@ def login(user_data: UserLogin) -> UserLoginReturn:
     token = create_access_token(data={"sub": user.email})
 
     return UserLoginReturn(
-        id=user.id,
-        access_token=token,
-        token_type="bearer",
+        auth=UserAuth(access_token=token, token_type="bearer"), id=user.id
     )
 
 
