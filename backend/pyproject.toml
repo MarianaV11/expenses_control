@@ -12,6 +12,7 @@ dependencies = [
     "pre-commit>=4.2.0",
     "psycopg2>=2.9.10",
     "pyjwt>=2.10.1",
+    "python-multipart>=0.0.20",
     "sqlalchemy>=2.0.40",
     "uvicorn>=0.34.0",
 ]

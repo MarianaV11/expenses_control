@@ -1,4 +1,12 @@
-from sqlalchemy import LargeBinary, Column, DateTime, Integer, String, ForeignKey
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    LargeBinary,
+    String,
+)
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -13,6 +21,7 @@ class Image(BASE):
     name = Column(String, nullable=False)
     created_at = Column(DateTime, nullable=False, default=func.now())
     mime_type = Column(String, nullable=False)
+    is_profile = Column(Boolean, nullable=False, default=False)
     data = Column(LargeBinary, nullable=False)
 
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
