@@ -1,4 +1,5 @@
 from datetime import date, datetime
+
 from pydantic import BaseModel
 
 
@@ -17,3 +18,12 @@ class ExpenseCreate(ExpenseBase):
 class ExpenseRead(ExpenseBase):
     id: int
     created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class ExpensesList(BaseModel):
+    page: int
+    total_page: int
+    total_expenses: int
+    expenses: list[ExpenseRead]

@@ -66,7 +66,7 @@ def get_profile(user_id: int) -> StreamingResponse:
 def update_profile(user_id: int, image_data: ImageCreate) -> JSONResponse:
     db = SessionLocal()
 
-    image = db.query(Image).filter(Image.user_id == user_id).first()
+    image = db.query(Image).filter(Image.user_id == user_id, Image.is_profile).first()
 
     if not image:
         raise HTTPException(
@@ -86,4 +86,24 @@ def update_profile(user_id: int, image_data: ImageCreate) -> JSONResponse:
             "message": "The profile picture was update with success!",
             "id": image.id,
         },
+    )
+
+
+def delete_profile(user_id: int) -> JSONResponse:
+    db = SessionLocal()
+
+    image = db.query(Image).filter(Image.user_id == user_id, Image.is_profile).first()
+
+    if not image:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Image of profile not founded in our database.",
+        )
+
+    db.delete(image)
+    db.commit()
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={"message": "Image deleted succesfully!"},
     )

@@ -1,7 +1,12 @@
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from fastapi.responses import JSONResponse, StreamingResponse
 from schemas.image_schema import ImageCreate, ImageRead
-from services.image_service import attach_profile, get_profile, update_profile
+from services.image_service import (
+    attach_profile,
+    get_profile,
+    update_profile,
+    delete_profile,
+)
 from utils.auth import require_token_valid
 
 router = APIRouter()
@@ -18,7 +23,7 @@ async def attach_profile_route(
     _: None = Depends(require_token_valid),
 ):
     """
-    This route is responsible to attach a profile image to user, if the user don't has one.
+    This route is responsible to attach a profile image to the user, if the user doesn't have one.
     """
 
     if file.content_type not in ALLOWED_MIME_TYPES:
@@ -80,3 +85,12 @@ async def update_profile_route(
     )
 
     return update_profile(user_id=user_id, image_data=image_schema)
+
+
+@router.delete("/images/profile/delete")
+def delete_profile_route(
+    user_id: int, _: None = Depends(require_token_valid)
+) -> JSONResponse:
+    """This route will delete the profile picture of the user."""
+
+    return delete_profile(user_id=user_id)

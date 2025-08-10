@@ -1,3 +1,4 @@
+from controller.expense_controller import router as expense_router
 from controller.image_controller import router as image_router
 from controller.user_controller import router as user_router
 from fastapi import FastAPI
@@ -11,7 +12,8 @@ def create_app():
         description="This is the backend of my personal finance control application. The project was developed for my portfolio, is freely available, and is licensed under the MIT license.",
     )
 
-    app.include_router(user_router, prefix="/api", tags=["Users"])
+    app.include_router(expense_router, prefix="/api", tags=["Expenses"])
     app.include_router(image_router, prefix="/api", tags=["Images"])
+    app.include_router(user_router, prefix="/api", tags=["Users"])
 
     return app
