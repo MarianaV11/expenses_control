@@ -5,8 +5,16 @@ from schemas.user_schema import (
     UserIdentifier,
     UserLogin,
     UserLoginReturn,
+    UserUpdatePassword,
 )
-from services.user_service import create_user, get_user, login
+from services.user_service import (
+    create_user,
+    delete_user,
+    get_user,
+    login,
+    update_user,
+    update_user_password,
+)
 from utils.auth import require_token_valid
 
 router = APIRouter()
@@ -31,3 +39,24 @@ def get_user_route(user_id: int, _: None = Depends(require_token_valid)):
     """Return information of user by it's id"""
 
     return get_user(UserIdentifier(id=user_id))
+
+
+@router.delete("/users/delete")
+def delete_user_route(user_id: int, _: None = Depends(require_token_valid)):
+    """Permanently deletes a user"""
+
+    return delete_user(user_id=UserIdentifier(id=user_id))
+
+
+@router.put("/users/update", response_model=UserBase)
+def update_user_route(user_data: UserBase):
+    """Update general user information."""
+
+    return update_user(user_data=user_data)
+
+
+@router.patch("/users/update_password")
+def update_user_password_route(user_data: UserUpdatePassword):
+    """Update password of user"""
+
+    return update_user_password(user_data=user_data)

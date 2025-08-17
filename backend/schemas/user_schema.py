@@ -53,3 +53,8 @@ class UserRead(UserIdentifier):
 
 class UserExpenses(UserRead):
     expenses: List[ExpenseRead] = []
+
+
+class UserUpdatePassword(UserIdentifier):
+    new_password: str
+    old_password: str

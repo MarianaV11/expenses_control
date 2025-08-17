@@ -9,6 +9,7 @@ from schemas.user_schema import (
     UserIdentifier,
     UserLogin,
     UserLoginReturn,
+    UserUpdatePassword,
 )
 from utils.auth import create_access_token
 from utils.security import hash_password, verify_password
@@ -83,3 +84,89 @@ def get_user(user_id: UserIdentifier) -> UserBase:
     db.close()
 
     return UserBase.model_validate(user)
+
+
+def delete_user(user_id: UserIdentifier) -> JSONResponse:
+    db = SessionLocal()
+
+    user = db.query(User).filter(User.id == user_id.id).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": "Current user not found in our database."},
+        )
+
+    db.delete(user)
+    db.commit()
+    db.close()
+
+    return JSONResponse(
+        content={"message": "User deleted successfully!"},
+        status_code=status.HTTP_200_OK,
+    )
+
+
+def update_user(user_data: UserBase) -> UserBase:
+    db = SessionLocal()
+
+    try:
+        user = db.query(User).filter(User.id == user_data.id).first()
+
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={"message": "Current user not found in our database."},
+            )
+
+        user.name = user_data.name
+        user.email = user_data.email
+        user.birthday = user_data.birthday
+        user.is_restricted = user_data.is_restricted
+        user.is_admin = user_data.is_admin
+
+        db.commit()
+        db.refresh(user)
+
+        return UserBase.model_validate(user)
+    except Exception as e:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"message": f"An error occurred: {e}"},
+        )
+    finally:
+        db.close()
+
+
+def update_user_password(user_data: UserUpdatePassword) -> JSONResponse:
+    db = SessionLocal()
+
+    try:
+        user = db.query(User).filter(User.id == user_data.id).first()
+
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={"message": "Current user not found in our database."},
+            )
+        if not verify_password(
+            plain_password=user_data.old_password, hashed_password=user.password
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail={"message": "The old password is wrong."},
+            )
+
+        user.password = hash_password(user_data.new_password)
+
+        db.commit()
+        db.refresh(user)
+
+        return JSONResponse(content={"message": "Password updated successfully!"})
+    except Exception as e:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"message": f"An error occurred: {e}"},
+        )
+    finally:
+        db.close()
