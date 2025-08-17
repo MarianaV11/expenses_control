@@ -43,6 +43,8 @@ def attach_profile(image_data: ImageCreate) -> ImageRead:
     db.commit()
     db.refresh(new_image)
 
+    db.close()
+
     return new_image
 
 
@@ -55,6 +57,8 @@ def get_profile(user_id: int) -> StreamingResponse:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User image not found."
         )
+
+    db.close()
 
     return StreamingResponse(
         media_type=image.mime_type,
@@ -80,6 +84,8 @@ def update_profile(user_id: int, image_data: ImageCreate) -> JSONResponse:
     db.commit()
     db.refresh(image)
 
+    db.close()
+
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content={
@@ -102,6 +108,8 @@ def delete_profile(user_id: int) -> JSONResponse:
 
     db.delete(image)
     db.commit()
+
+    db.close()
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,

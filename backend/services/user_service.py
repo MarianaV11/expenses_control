@@ -38,6 +38,8 @@ def create_user(user_data: UserCreate) -> JSONResponse:
     db.commit()
     db.refresh(new_user)
 
+    db.close()
+
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content={"message": "User created with success!", "id": new_user.id},
@@ -60,6 +62,8 @@ def login(user_data: UserLogin) -> UserLoginReturn:
 
     token = create_access_token(data={"sub": user.email})
 
+    db.close()
+
     return UserLoginReturn(
         auth=UserAuth(access_token=token, token_type="bearer"), id=user.id
     )
@@ -75,5 +79,7 @@ def get_user(user_id: UserIdentifier) -> UserBase:
             status_code=status.HTTP_404_NOT_FOUND,
             detail={"message": "Current user not found in our database."},
         )
+
+    db.close()
 
     return UserBase.model_validate(user)
