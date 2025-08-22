@@ -22,3 +22,4 @@ class User(BASE):
     expenses = relationship(
         "Expense", back_populates="user", cascade="all, delete-orphan"
     )
+    labels = relationship("Label", back_populates="user", cascade="all, delete-orphan")

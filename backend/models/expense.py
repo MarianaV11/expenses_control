@@ -18,5 +18,7 @@ class Expense(BASE):
     payment_type = Column(String, nullable=False)
 
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-
     user = relationship("User", back_populates="expenses")
+
+    label_id = Column(Integer, ForeignKey("labels.id"), nullable=True)
+    label = relationship("Label", back_populates="expenses")
