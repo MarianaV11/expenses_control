@@ -14,7 +14,7 @@ from utils.auth import require_token_valid
 router = APIRouter()
 
 
-@router.post("/expense/create", response_model=ExpenseRead)
+@router.post("/expenses/create", response_model=ExpenseRead)
 def create_expense_route(
     expense: ExpenseCreate, _: None = Depends(require_token_valid)
 ):
@@ -25,7 +25,7 @@ def create_expense_route(
     return create_expense(expense=expense)
 
 
-@router.get("/expense/user_expenses", response_model=ExpensesList)
+@router.get("/expenses/user_expenses", response_model=ExpensesList)
 def get_expenses_route(
     user_id: int,
     page: int = Query(1, ge=1),
@@ -39,7 +39,7 @@ def get_expenses_route(
     return get_expenses(user_id=user_id, page=page, per_page=per_page)
 
 
-@router.get("/expense/user_expense", response_model=ExpenseRead)
+@router.get("/expenses/user_expense", response_model=ExpenseRead)
 def get_expense_route(expense_id: int, _: None = Depends(require_token_valid)):
     """
     Get returned an expense by it's id
@@ -48,7 +48,7 @@ def get_expense_route(expense_id: int, _: None = Depends(require_token_valid)):
     return get_expense(expense_id=expense_id)
 
 
-@router.delete("/expense/delete_expenses")
+@router.delete("/expenses/delete_expenses")
 def delete_expenses_route(
     expense_ids: list[int], _: None = Depends(require_token_valid)
 ) -> JSONResponse:
@@ -59,7 +59,7 @@ def delete_expenses_route(
     return delete_expenses(expense_ids=expense_ids)
 
 
-@router.delete("/expense/delete_expense")
+@router.delete("/expenses/delete_expense")
 def delete_expense_route(
     expense_id: int, _: None = Depends(require_token_valid)
 ) -> JSONResponse:
@@ -70,7 +70,7 @@ def delete_expense_route(
     return delete_expense(expense_id=expense_id)
 
 
-@router.put("/expense/update_expense")
+@router.put("/expenses/update_expense")
 def update_expense_route(
     expense_id: int, expense_data: ExpenseCreate, _: None = Depends(require_token_valid)
 ) -> JSONResponse:
