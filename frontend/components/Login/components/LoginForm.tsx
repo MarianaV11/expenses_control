@@ -1,0 +1,104 @@
+"use client";
+
+import { axiosLogin } from "@/service/axios_config";
+import { removeToken, setToken } from "@/service/local_storage";
+import { AuthRequest, AuthResponse } from "@/types/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { AxiosError, AxiosResponse } from "axios";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import Button from "@/components/external/button";
+
+const AuthSchema = z.object({
+  email: z.email("Invalid email!"),
+  password: z.string().min(1, { message: "Password required!" }),
+});
+type AuthSchemaType = z.infer<typeof AuthSchema>;
+
+const LoginForm = () => {
+  const form = useForm<AuthSchemaType>({
+    resolver: zodResolver(AuthSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  useEffect(() => {
+    removeToken();
+  }, []);
+
+  const onSubmit = (values: AuthSchemaType) => {
+    const onSuccess = (response: AxiosResponse<AuthResponse>) => {
+      const data = response.data;
+
+      setToken(data.auth.access_token, data.id.toString());
+      console.log("Ok");
+    };
+
+    const onError = (error: AxiosError) => {
+      console.log(error);
+    };
+
+    const body: AuthRequest = {
+      email: values.email,
+      password: values.password,
+    };
+
+    axiosLogin.post("users/login", body).then(onSuccess).catch(onError);
+  };
+
+  return (
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col gap-5 min-w-70"
+      >
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="font-bold">Email</FormLabel>
+              <FormControl>
+                <Input placeholder="Your email comes here" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem className="mb-5">
+              <FormLabel className="font-bold">Password</FormLabel>
+              <FormControl>
+                <Input
+                  type="password"
+                  placeholder="Your password comes here"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit">Login</Button>
+      </form>
+    </Form>
+  );
+};
+
+export default LoginForm;
