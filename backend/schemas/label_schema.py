@@ -9,18 +9,15 @@ class LabelBase(BaseModel):
 
 class LabelCreate(BaseModel):
     name: str
-    color: str
     user_id: int
 
 
 class LabelUpdate(LabelBase):
     name: str
-    color: str
 
 
 class LabelRead(LabelBase):
     name: str
-    color: str
     user_id: int
     created_at: datetime
 

@@ -15,7 +15,7 @@ def create_label(label: LabelCreate) -> LabelRead:
     db = SessionLocal()
 
     try:
-        new_label = Label(name=label.name, color=label.color, user_id=label.user_id)
+        new_label = Label(name=label.name, user_id=label.user_id)
 
         db.add(new_label)
         db.commit()
@@ -109,7 +109,6 @@ def update_label(label_data: LabelUpdate) -> LabelRead:
                 },
             )
 
-        label.color = label_data.color
         label.name = label_data.name
 
         db.commit()
