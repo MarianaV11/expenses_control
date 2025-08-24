@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -9,10 +10,15 @@ class ExpenseBase(BaseModel):
     day: date
     card: str
     payment_type: str
+    label_id: Optional[int]
 
 
 class ExpenseCreate(ExpenseBase):
     user_id: int
+
+
+class ExpenseUpdate(ExpenseBase):
+    id: int
 
 
 class ExpenseRead(ExpenseBase):

@@ -1,6 +1,11 @@
 from fastapi import APIRouter, Depends, Query
 from fastapi.responses import JSONResponse
-from schemas.expense_schema import ExpenseCreate, ExpenseRead, ExpensesList
+from schemas.expense_schema import (
+    ExpenseCreate,
+    ExpenseRead,
+    ExpensesList,
+    ExpenseUpdate,
+)
 from services.expense_service import (
     create_expense,
     delete_expense,
@@ -70,12 +75,12 @@ def delete_expense_route(
     return delete_expense(expense_id=expense_id)
 
 
-@router.put("/expenses/update_expense")
+@router.put("/expenses/update_expense", response_model=ExpenseRead)
 def update_expense_route(
-    expense_id: int, expense_data: ExpenseCreate, _: None = Depends(require_token_valid)
-) -> JSONResponse:
+    expense_data: ExpenseUpdate, _: None = Depends(require_token_valid)
+):
     """
     Update an expense by its id.
     """
 
-    return update_expense(expense_id=expense_id, expense_data=expense_data)
+    return update_expense(expense_data=expense_data)
