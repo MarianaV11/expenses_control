@@ -1,9 +1,11 @@
-import React from "react";
 import LoginForm from "./LoginForm";
 
 const LoginContainer = () => {
   return (
-    <div className="relative p-7 rounded-3xl shadow-2xl border-4">
+    <div>
+      <h1 className="font-bold text-center text-white underline text-2xl mb-8">
+        Sign in
+      </h1>
       <LoginForm />
     </div>
   );

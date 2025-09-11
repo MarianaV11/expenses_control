@@ -1,5 +1,15 @@
 "use client";
 
+import Button from "@/components/external/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { axiosLogin } from "@/service/axios_config";
 import { removeToken, setToken } from "@/service/local_storage";
 import { AuthRequest, AuthResponse } from "@/types/auth";
@@ -8,17 +18,6 @@ import { AxiosError, AxiosResponse } from "axios";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import Button from "@/components/external/button";
 
 const AuthSchema = z.object({
   email: z.email("Invalid email!"),
@@ -44,11 +43,10 @@ const LoginForm = () => {
       const data = response.data;
 
       setToken(data.auth.access_token, data.id.toString());
-      console.log("Ok");
     };
 
     const onError = (error: AxiosError) => {
-      console.log(error);
+      console.error(error);
     };
 
     const body: AuthRequest = {
@@ -62,15 +60,15 @@ const LoginForm = () => {
   return (
     <Form {...form}>
       <form
+        className="flex flex-col gap-5"
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-5 min-w-70"
       >
         <FormField
           control={form.control}
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="font-bold">Email</FormLabel>
+              <FormLabel className="font-bold text-white">Email</FormLabel>
               <FormControl>
                 <Input placeholder="Your email comes here" {...field} />
               </FormControl>
@@ -83,7 +81,7 @@ const LoginForm = () => {
           name="password"
           render={({ field }) => (
             <FormItem className="mb-5">
-              <FormLabel className="font-bold">Password</FormLabel>
+              <FormLabel className="font-bold text-white">Password</FormLabel>
               <FormControl>
                 <Input
                   type="password"

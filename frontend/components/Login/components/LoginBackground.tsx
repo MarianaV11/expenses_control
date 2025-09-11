@@ -30,7 +30,7 @@ const LoginBackground = () => {
       preserveAspectRatio="xMidYMax slice"
       style={{
         backgroundColor: "#2E2E2E",
-        backgroundImage: "linear-gradient(to bottom, #D3D3D3",
+        backgroundImage: "linear-gradient(to bottom, #1A1F24)",
       }}
     >
       <defs>

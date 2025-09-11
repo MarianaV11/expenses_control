@@ -3,6 +3,7 @@ from controller.image_controller import router as image_router
 from controller.label_controller import router as label_controller
 from controller.user_controller import router as user_router
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 
 def create_app():
@@ -11,6 +12,19 @@ def create_app():
         version="0.1.0",
         docs_url="/api/docs",
         description="This is the backend of my personal finance control application. The project was developed for my portfolio, is freely available, and is licensed under the MIT license.",
+    )
+
+    origins = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ]
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
 
     app.include_router(expense_router, prefix="/api", tags=["Expenses"])

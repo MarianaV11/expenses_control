@@ -1,4 +1,10 @@
-import React, { ButtonHTMLAttributes, ReactNode } from "react";
+/**
+ * Part of this component uses code from:
+ * Copyright (c) 2025 himanshu9682 (Himanshu Verma)
+ * Licensed under the MIT License.
+ */
+
+import { ButtonHTMLAttributes, ReactNode } from "react";
 import styled from "styled-components";
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -9,13 +15,13 @@ const Button = ({ children, ...props }: Props) => {
   return (
     <StyledWrapper>
       <div className="container">
-        <a href="#" className="button type--C">
+        <button {...props} className="button type--C">
           <div className="button__line" />
           <div className="button__line" />
           <span className="button__text">{children}</span>
           <div className="button__drow1" />
           <div className="button__drow2" />
-        </a>
+        </button>
       </div>
     </StyledWrapper>
   );
@@ -31,8 +37,8 @@ const StyledWrapper = styled.div`
     --back_color: #e9ecff;
   }
   .type--C {
-    --line_color: #00135c;
-    --back_color: #defffa;
+    --line_color: #4300FF;
+    --back_color: #4D55CC;
   }
   .button {
     position: relative;
@@ -45,8 +51,10 @@ const StyledWrapper = styled.div`
     color: var(--line_color);
     letter-spacing: 2px;
     transition: all 0.3s ease;
+    cursor: pointer;
   }
   .button__text {
+    color: white;
     display: flex;
     justify-content: center;
     align-items: center;
