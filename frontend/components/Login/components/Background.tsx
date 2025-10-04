@@ -1,6 +1,6 @@
 import React from "react";
 
-const LoginBackground = () => {
+const Background = () => {
   const waves = [
     {
       opacity: 0.3,
@@ -70,4 +70,4 @@ const LoginBackground = () => {
   );
 };
 
-export default LoginBackground;
+export default Background;
