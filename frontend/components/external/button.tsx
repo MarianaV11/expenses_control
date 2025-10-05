@@ -37,8 +37,8 @@ const StyledWrapper = styled.div`
     --back_color: #e9ecff;
   }
   .type--C {
-    --line_color: #4300FF;
-    --back_color: #4D55CC;
+    --line_color: #4300ff;
+    --back_color: #4d55cc;
   }
   .button {
     position: relative;
@@ -54,7 +54,7 @@ const StyledWrapper = styled.div`
     cursor: pointer;
   }
   .button__text {
-    color: white;
+    color: #ff9013;
     display: flex;
     justify-content: center;
     align-items: center;

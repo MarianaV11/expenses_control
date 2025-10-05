@@ -1,5 +1,3 @@
-import React from "react";
-
 const Background = () => {
   const waves = [
     {
@@ -30,7 +28,7 @@ const Background = () => {
       preserveAspectRatio="xMidYMax slice"
       style={{
         backgroundColor: "#2E2E2E",
-        backgroundImage: "linear-gradient(to bottom, #1A1F24)",
+        backgroundImage: "linear-gradient(to bottom, #f4f4f5)",
       }}
     >
       <defs>

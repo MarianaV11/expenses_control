@@ -1,4 +1,3 @@
-import Image from "next/image";
 import React from "react";
 
 interface RegisterTaglineProps {
@@ -7,16 +6,12 @@ interface RegisterTaglineProps {
 
 const RegisterTagline = ({ onRegisterClick }: RegisterTaglineProps) => {
   return (
-    <div className="text-white">
+    <div className="text-center max-md:hidden">
       <h1 className="text-6xl font-extrabold mb-5 text-[#4300FF]">
         Register Now!
       </h1>
-      <p className="w-[25rem] text-lg">
-        Start your journey to financial freedom today. With our platform, you
-        can easily track your expenses, organize your budget, and take smarter
-        decisions to achieve the dreams you’ve always wanted.
-      </p>
-      <p className="mt-40">
+      <p className="text-2xl">Start your journey to financial freedom today.</p>
+      <p className="mt-30">
         You already have an account? Click{" "}
         <span
           onClick={onRegisterClick}

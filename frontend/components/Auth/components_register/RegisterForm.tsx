@@ -6,7 +6,6 @@ import { Calendar } from "@/components/ui/calendar";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -84,7 +83,7 @@ const RegisterForm = () => {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="font-bold text-white">Name</FormLabel>
+              <FormLabel className="font-bold">Name</FormLabel>
               <FormControl>
                 <Input placeholder="Your name comes here" {...field} />
               </FormControl>
@@ -96,17 +95,15 @@ const RegisterForm = () => {
           control={form.control}
           name="birthdate"
           render={({ field }) => (
-            <FormItem className="flex flex-col w-full text-white">
-              <FormLabel className="text-white font-bold">
-                Date of Birth
-              </FormLabel>
+            <FormItem className="flex flex-col w-full">
+              <FormLabel className=" font-bold">Date of Birth</FormLabel>
               <Popover>
-                <PopoverTrigger asChild>
+                <PopoverTrigger asChild className="bg-slate-background">
                   <FormControl>
                     <Button
                       variant={"outline"}
                       className={cn(
-                        "w-[100%] pl-3 text-left font-normal bg-[#1A1F24] hover:bg-[#2A2F34] hover:text-white",
+                        "w-[100%] pl-3 text-left font-normal",
                         !field.value && "text-muted-foreground"
                       )}
                     >
@@ -140,7 +137,7 @@ const RegisterForm = () => {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="font-bold text-white">Email</FormLabel>
+              <FormLabel className="font-bold ">Email</FormLabel>
               <FormControl>
                 <Input placeholder="Your email comes here" {...field} />
               </FormControl>
@@ -153,7 +150,7 @@ const RegisterForm = () => {
           name="password"
           render={({ field }) => (
             <FormItem className="mb-5">
-              <FormLabel className="font-bold text-white">Password</FormLabel>
+              <FormLabel className="font-bold ">Password</FormLabel>
               <FormControl>
                 <Input
                   type="password"
