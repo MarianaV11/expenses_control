@@ -68,7 +68,7 @@ const LoginForm = () => {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="font-bold text-white">Email</FormLabel>
+              <FormLabel className="font-bold">Email</FormLabel>
               <FormControl>
                 <Input placeholder="Your email comes here" {...field} />
               </FormControl>
@@ -81,7 +81,7 @@ const LoginForm = () => {
           name="password"
           render={({ field }) => (
             <FormItem className="mb-5">
-              <FormLabel className="font-bold text-white">Password</FormLabel>
+              <FormLabel className="font-bold">Password</FormLabel>
               <FormControl>
                 <Input
                   type="password"

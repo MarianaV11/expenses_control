@@ -1,6 +1,4 @@
-import React from "react";
-
-const LoginBackground = () => {
+const Background = () => {
   const waves = [
     {
       opacity: 0.3,
@@ -30,7 +28,7 @@ const LoginBackground = () => {
       preserveAspectRatio="xMidYMax slice"
       style={{
         backgroundColor: "#2E2E2E",
-        backgroundImage: "linear-gradient(to bottom, #1A1F24)",
+        backgroundImage: "linear-gradient(to bottom, #f4f4f5)",
       }}
     >
       <defs>
@@ -70,4 +68,4 @@ const LoginBackground = () => {
   );
 };
 
-export default LoginBackground;
+export default Background;
