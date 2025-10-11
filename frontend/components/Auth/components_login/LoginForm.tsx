@@ -15,6 +15,7 @@ import { removeToken, setToken } from "@/service/local_storage";
 import { AuthRequest, AuthResponse } from "@/types/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AxiosError, AxiosResponse } from "axios";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -26,6 +27,8 @@ const AuthSchema = z.object({
 type AuthSchemaType = z.infer<typeof AuthSchema>;
 
 const LoginForm = () => {
+  const router = useRouter();
+
   const form = useForm<AuthSchemaType>({
     resolver: zodResolver(AuthSchema),
     defaultValues: {
@@ -33,7 +36,6 @@ const LoginForm = () => {
       password: "",
     },
   });
-
   useEffect(() => {
     removeToken();
   }, []);
@@ -41,8 +43,9 @@ const LoginForm = () => {
   const onSubmit = (values: AuthSchemaType) => {
     const onSuccess = (response: AxiosResponse<AuthResponse>) => {
       const data = response.data;
-
       setToken(data.auth.access_token, data.id.toString());
+
+      //router.push("/expense");
     };
 
     const onError = (error: AxiosError) => {

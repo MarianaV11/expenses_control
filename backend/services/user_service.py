@@ -15,7 +15,7 @@ from utils.auth import create_access_token
 from utils.security import hash_password, verify_password
 
 
-def create_user(user_data: UserCreate) -> UserBase | JSONResponse:
+def create_user(user_data: UserCreate) -> UserLoginReturn | JSONResponse:
     db = SessionLocal()
 
     try:
@@ -40,7 +40,11 @@ def create_user(user_data: UserCreate) -> UserBase | JSONResponse:
         db.commit()
         db.refresh(new_user)
 
-        return new_user
+        token = create_access_token(data={"sub": new_user.email})
+
+        return UserLoginReturn(
+            auth=UserAuth(access_token=token, token_type="bearer"), id=new_user.id
+        )
     except Exception as e:
         db.rollback()
 

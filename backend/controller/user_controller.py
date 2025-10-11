@@ -20,7 +20,7 @@ from utils.auth import require_token_valid
 router = APIRouter()
 
 
-@router.post("/users/create", response_model=UserBase)
+@router.post("/users/create", response_model=UserLoginReturn)
 def create_user_route(user: UserCreate):
     """Creates a new user"""
 

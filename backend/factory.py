@@ -14,10 +14,7 @@ def create_app():
         description="This is the backend of my personal finance control application. The project was developed for my portfolio, is freely available, and is licensed under the MIT license.",
     )
 
-    origins = [
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-    ]
+    origins = ["*"]
 
     app.add_middleware(
         CORSMiddleware,

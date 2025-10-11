@@ -1,6 +1,8 @@
 export type UserCreate = {
   name: string;
-  birthdate: Date;
+  birthday: string;
   email: string;
   password: string;
+  is_restricted: boolean;
+  is_admin: boolean;
 };

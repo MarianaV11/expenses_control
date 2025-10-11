@@ -19,12 +19,14 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { axiosLogin } from "@/service/axios_config";
-import { removeToken } from "@/service/local_storage";
+import { removeToken, setToken } from "@/service/local_storage";
+import { AuthResponse } from "@/types/auth";
 import { UserCreate } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AxiosError, AxiosResponse } from "axios";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -47,15 +49,17 @@ const RegisterForm = () => {
       birthdate: new Date(),
     },
   });
+  const router = useRouter();
 
   useEffect(() => {
     removeToken();
   }, []);
 
   const onSubmit = (values: RegisterSchemaType) => {
-    const onSuccess = (response: AxiosResponse<UserCreate>) => {
+    const onSuccess = (response: AxiosResponse<AuthResponse>) => {
       const data = response.data;
-      console.log(data);
+      setToken(data.auth.access_token, data.id.toString());
+      router.push("/expense");
     };
 
     const onError = (error: AxiosError) => {
@@ -66,7 +70,9 @@ const RegisterForm = () => {
       email: values.email,
       password: values.password,
       name: values.name,
-      birthdate: values.birthdate,
+      birthday: new Intl.DateTimeFormat("sv-SE").format(values.birthdate),
+      is_restricted: false,
+      is_admin: false,
     };
 
     axiosLogin.post("users/create", body).then(onSuccess).catch(onError);

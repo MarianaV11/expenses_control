@@ -28,7 +28,6 @@ const Background = () => {
       preserveAspectRatio="xMidYMax slice"
       style={{
         backgroundColor: "#2E2E2E",
-        backgroundImage: "linear-gradient(to bottom, #f4f4f5)",
       }}
     >
       <defs>
