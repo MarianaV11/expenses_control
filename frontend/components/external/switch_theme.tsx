@@ -1,16 +1,23 @@
-import React, { useEffect } from "react";
-import styled from "styled-components";
 import { useTheme } from "next-themes";
+import styled from "styled-components";
 
 const SwitchTheme = () => {
-  const { setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
+
+  const changeTheme = () => {
+    if (theme === "light") {
+      setTheme("dark");
+    } else {
+      setTheme("light");
+    }
+  };
 
   return (
     <StyledWrapper>
       <label className="switch">
         <input id="input" type="checkbox" />
-        <div className="slider round">
-          <div className="sun-moon" onClick={() => setTheme("dark")}>
+        <div className="slider round" onClick={() => changeTheme()}>
+          <div className="sun-moon">
             <svg id="moon-dot-1" className="moon-dot" viewBox="0 0 100 100">
               <circle cx={50} cy={50} r={50} />
             </svg>
@@ -48,7 +55,7 @@ const SwitchTheme = () => {
               <circle cx={50} cy={50} r={50} />
             </svg>
           </div>
-          <div className="stars" onClick={() => setTheme("light")}>
+          <div className="stars">
             <svg id="star-1" className="star" viewBox="0 0 20 20">
               <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z" />
             </svg>

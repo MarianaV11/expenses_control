@@ -8,51 +8,64 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Home, Settings, TrendingUp, Wallet } from "lucide-react";
-import { useEffect, useState } from "react";
-import SwitchTheme from "../../external/switch_theme";
 import { axios } from "@/service/axios_config";
-
-const navItems = [
-  { title: "Dashboard", url: "/", icon: Home },
-  { title: "Despesas", url: "/expenses", icon: Wallet },
-  { title: "Relatórios", url: "/reports", icon: TrendingUp },
-  { title: "Configurações", url: "/settings", icon: Settings },
-];
+import { getUser } from "@/service/local_storage";
+import { UserIdentifier, UserRead } from "@/types/user";
+import { useCallback, useEffect, useState } from "react";
+import SwitchTheme from "../../external/switch_theme";
 
 export function Navbar() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<UserRead | null>(null);
 
-  useEffect(() => {
-    getUserImage(1);
+  const getUserInfo = useCallback(() => {
+    const userId: string | null = getUser();
+
+    if (userId) {
+      const body: UserIdentifier = {
+        user_id: parseInt(userId),
+      };
+
+      axios
+        .get(`/users/user`, { params: body })
+        .then((response) => setUser(response.data))
+        .catch((error) => console.log(error));
+    }
   }, []);
 
-  const getUserImage = (user_id: number) => {
-    axios
-      .get(`/images/${user_id}/profile`)
-      .then((response) => setUser(response.data))
-      .catch((error) => console.log(error));
-  };
+  useEffect(() => {
+    getUserInfo();
+  }, [getUserInfo]);
 
   return (
-    <nav className="p-2 border-b sticky top-0 z-50 flex justify-end">
+    <nav className="p-2 border-b sticky top-0 z-50 flex justify-between items-center mb-0">
       <SwitchTheme />
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="rounded-4xl"></Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56" align="start">
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
-          <DropdownMenuGroup>
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>Previous Months</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>Log out</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              className="rounded-md p-1 flex items-center h-[3rem] "
+            >
+              {user ? (
+                <p>{user.name.split(" ").slice(0, 2).join(" ")}</p>
+              ) : (
+                <p>User</p>
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56" align="start">
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuGroup>
+              <DropdownMenuItem>Profile</DropdownMenuItem>
+              <DropdownMenuItem>Settings</DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>Previous Months</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>Log out</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </nav>
   );
 }

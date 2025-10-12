@@ -7,7 +7,7 @@ import React from "react";
 
 const Expense = () => {
   return (
-    <DefaultLayout className="flex flex-col gap-8">
+    <DefaultLayout>
       <div className="m-4 flex flex-col gap-4">
         <FinancialSummary />
         <Expenses />

@@ -26,9 +26,6 @@ const Background = () => {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 1600 900"
       preserveAspectRatio="xMidYMax slice"
-      style={{
-        backgroundColor: "#2E2E2E",
-      }}
     >
       <defs>
         <linearGradient id="bg">

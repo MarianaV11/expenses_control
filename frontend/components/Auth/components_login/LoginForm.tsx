@@ -16,7 +16,7 @@ import { AuthRequest, AuthResponse } from "@/types/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AxiosError, AxiosResponse } from "axios";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -28,7 +28,6 @@ type AuthSchemaType = z.infer<typeof AuthSchema>;
 
 const LoginForm = () => {
   const router = useRouter();
-
   const form = useForm<AuthSchemaType>({
     resolver: zodResolver(AuthSchema),
     defaultValues: {
@@ -36,29 +35,33 @@ const LoginForm = () => {
       password: "",
     },
   });
+
   useEffect(() => {
     removeToken();
   }, []);
 
-  const onSubmit = (values: AuthSchemaType) => {
-    const onSuccess = (response: AxiosResponse<AuthResponse>) => {
-      const data = response.data;
-      setToken(data.auth.access_token, data.id.toString());
+  const onSubmit = useCallback(
+    (values: AuthSchemaType) => {
+      const onSuccess = (response: AxiosResponse<AuthResponse>) => {
+        const data = response.data;
+        setToken(data.auth.access_token, data.id.toString());
 
-      //router.push("/expense");
-    };
+        router.push("/expense");
+      };
 
-    const onError = (error: AxiosError) => {
-      console.error(error);
-    };
+      const onError = (error: AxiosError) => {
+        console.error(error);
+      };
 
-    const body: AuthRequest = {
-      email: values.email,
-      password: values.password,
-    };
+      const body: AuthRequest = {
+        email: values.email,
+        password: values.password,
+      };
 
-    axiosLogin.post("users/login", body).then(onSuccess).catch(onError);
-  };
+      axiosLogin.post("users/login", body).then(onSuccess).catch(onError);
+    },
+    [router]
+  );
 
   return (
     <Form {...form}>

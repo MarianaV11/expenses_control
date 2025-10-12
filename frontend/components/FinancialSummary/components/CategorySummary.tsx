@@ -1,4 +1,3 @@
-import { SunMedium } from "lucide-react";
 import React from "react";
 
 interface CategorySummaryProps {

@@ -29,7 +29,7 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable}`}
     >
-      <body>
+      <body className="bg-background">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

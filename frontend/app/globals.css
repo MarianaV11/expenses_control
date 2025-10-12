@@ -1,8 +1,5 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "primereact/resources/primereact.min.css";
-@import "primereact/resources/themes/lara-light-indigo/theme.css";
-@import "primeicons/primeicons.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -34,8 +31,12 @@
   --color-muted: var(--muted);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-secondary: var(--secondary);
+  --color-secondary-50: var(--secondary-50);
+  --color-secondary-90: var(--secondary-90);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
+  --color-primary-50: var(--primary-50);
+  --color-primary-90: var(--primary-90);
   --color-success: var(--success);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
@@ -56,8 +57,12 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.13 0.028 261.692);
   --primary: #4300ff;
+  --primary-50: rgba(67, 0, 255, 0.5);
+  --primary-90: rgba(67, 0, 255, 0.9);
   --primary-foreground: oklch(0.985 0.002 247.839);
   --secondary: #ff9013;
+  --secondary-50: rgba(255, 144, 19, 0.5);
+  --secondary-90: rgba(255, 144, 19, 0.9);
   --secondary-foreground: oklch(0.21 0.034 264.665);
   --muted: oklch(0.967 0.003 264.542);
   --muted-foreground: oklch(0.551 0.027 264.364);
@@ -84,15 +89,19 @@
 }
 
 .dark {
-  --background: oklch(20.716% 0.06522 265.527);
+  --background: #1a1f24;
   --foreground: oklch(0.985 0.002 247.839);
-  --card: oklch(14.574% 0.00429 285.807);
+  --card: #242a31;
   --card-foreground: oklch(0.985 0.002 247.839);
-  --popover: oklch(0.21 0.034 264.665);
+  --popover: rgba(26, 31, 36, 0.95);
   --popover-foreground: oklch(0.985 0.002 247.839);
   --primary: #4300ff;
+  --primary-50: rgba(67, 0, 255, 0.5);
+  --primary-90: rgba(67, 0, 255, 0.9);
   --primary-foreground: oklch(0.21 0.034 264.665);
   --secondary: #ff9013;
+  --secondary-50: rgba(255, 144, 19, 0.5);
+  --secondary-90: rgba(255, 144, 19, 0.9);
   --secondary-foreground: oklch(0.985 0.002 247.839);
   --muted: oklch(0.278 0.033 256.848);
   --muted-foreground: oklch(0.707 0.022 261.325);

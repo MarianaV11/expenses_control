@@ -1,7 +1,5 @@
 "use client";
 
-import React from "react";
-
 import {
   ColumnDef,
   flexRender,
@@ -67,7 +65,7 @@ const ExpensesTable = <TData, TValue>({
   return (
     <div className="overflow-hidden rounded-md border">
       <Table>
-        <TableHeader className="bg-slate-100 text-white">
+        <TableHeader className="bg-slate-100 dark:bg-popover">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {

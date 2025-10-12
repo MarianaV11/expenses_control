@@ -27,7 +27,7 @@ import { AxiosError, AxiosResponse } from "axios";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -40,6 +40,7 @@ const RegisterSchema = z.object({
 type RegisterSchemaType = z.infer<typeof RegisterSchema>;
 
 const RegisterForm = () => {
+  const router = useRouter();
   const form = useForm<RegisterSchemaType>({
     resolver: zodResolver(RegisterSchema),
     defaultValues: {
@@ -49,34 +50,37 @@ const RegisterForm = () => {
       birthdate: new Date(),
     },
   });
-  const router = useRouter();
 
   useEffect(() => {
     removeToken();
   }, []);
 
-  const onSubmit = (values: RegisterSchemaType) => {
-    const onSuccess = (response: AxiosResponse<AuthResponse>) => {
-      const data = response.data;
-      setToken(data.auth.access_token, data.id.toString());
-      router.push("/expense");
-    };
+  const onSubmit = useCallback(
+    (values: RegisterSchemaType) => {
+      const onSuccess = (response: AxiosResponse<AuthResponse>) => {
+        const data = response.data;
+        setToken(data.auth.access_token, data.id.toString());
 
-    const onError = (error: AxiosError) => {
-      console.error(error);
-    };
+        router.push("/expense");
+      };
 
-    const body: UserCreate = {
-      email: values.email,
-      password: values.password,
-      name: values.name,
-      birthday: new Intl.DateTimeFormat("sv-SE").format(values.birthdate),
-      is_restricted: false,
-      is_admin: false,
-    };
+      const onError = (error: AxiosError) => {
+        console.error(error);
+      };
 
-    axiosLogin.post("users/create", body).then(onSuccess).catch(onError);
-  };
+      const body: UserCreate = {
+        email: values.email,
+        password: values.password,
+        name: values.name,
+        birthday: new Intl.DateTimeFormat("sv-SE").format(values.birthdate),
+        is_restricted: false,
+        is_admin: false,
+      };
+
+      axiosLogin.post("users/create", body).then(onSuccess).catch(onError);
+    },
+    [router]
+  );
 
   return (
     <Form {...form}>
