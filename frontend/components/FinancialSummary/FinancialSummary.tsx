@@ -18,9 +18,9 @@ const FinancialSummary = () => {
             <p className="text-sm text-muted-foreground mb-1">
               Monthly Revenue
             </p>
-            <h3 className="text-2xl font-bold text-foreground">
+            <p className="text-2xl font-bold text-foreground">
               {formatCurrency(5000)}
-            </h3>
+            </p>
           </div>
           <div className="p-3 rounded-full bg-gradient-primary">
             <DollarSign className="w-6 h-6 text-white" />
@@ -34,9 +34,9 @@ const FinancialSummary = () => {
             <p className="text-sm text-muted-foreground mb-1">
               Monthly Expenses
             </p>
-            <h3 className="text-2xl font-bold text-foreground">
+            <p className="text-2xl font-bold text-foreground">
               {formatCurrency(2000)}
-            </h3>
+            </p>
           </div>
           <div className="p-3 rounded-full bg-gradient-danger">
             <TrendingDown className="w-6 h-6 text-white" />
@@ -50,13 +50,13 @@ const FinancialSummary = () => {
             <p className="text-sm text-muted-foreground mb-1">
               Remaining Balance
             </p>
-            <h3
+            <p
               className={`text-2xl font-bold ${
                 300 >= 0 ? "text-success" : "text-danger"
               }`}
             >
               {formatCurrency(300)}
-            </h3>
+            </p>
           </div>
           <div
             className={`p-3 rounded-full ${

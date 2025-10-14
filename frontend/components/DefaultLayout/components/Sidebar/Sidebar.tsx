@@ -52,7 +52,7 @@ const Sidebar = () => {
         )}
       >
         <div className="p-4 pb-2 flex justify-between items-center">
-          <h1 className={cn("text-primary-90", !expanded && "hidden")}>
+          <h1 className={cn("text-xl text-shadow-md", !expanded && "hidden")}>
             Expenses Control
           </h1>
           <Button
