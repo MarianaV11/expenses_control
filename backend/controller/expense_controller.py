@@ -5,6 +5,7 @@ from schemas.expense_schema import (
     ExpenseRead,
     ExpensesList,
     ExpenseUpdate,
+    ExpensesStatus,
 )
 from services.expense_service import (
     create_expense,
@@ -13,6 +14,7 @@ from services.expense_service import (
     get_expense,
     get_expenses,
     update_expense,
+    get_monthly_status,
 )
 from utils.auth import require_token_valid
 
@@ -84,3 +86,12 @@ def update_expense_route(
     """
 
     return update_expense(expense_data=expense_data)
+
+
+@router.get("/expenses/monthly_status", response_model=ExpensesStatus)
+def get_monthly_status_route(user_id: int, _: None = Depends(require_token_valid)):
+    """
+    Get the monthly status.
+    """
+
+    return get_monthly_status(user_id=user_id)

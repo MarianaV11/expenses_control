@@ -1,5 +1,6 @@
 from datetime import date, datetime
-from typing import List
+from decimal import Decimal
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -21,6 +22,7 @@ class UserBase(UserIdentifier):
     birthday: date
     is_restricted: bool
     is_admin: bool
+    monthly_revenue: Optional[Decimal] = 0.0
 
     model_config = {"from_attributes": True}
 

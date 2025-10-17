@@ -14,6 +14,7 @@ from services.user_service import (
     login,
     update_user,
     update_user_password,
+    update_monthly_revenue,
 )
 from utils.auth import require_token_valid
 
@@ -49,14 +50,27 @@ def delete_user_route(user_id: int, _: None = Depends(require_token_valid)):
 
 
 @router.put("/users/update", response_model=UserBase)
-def update_user_route(user_data: UserBase):
+def update_user_route(user_data: UserBase, _: None = Depends(require_token_valid)):
     """Update general user information."""
 
     return update_user(user_data=user_data)
 
 
 @router.patch("/users/update_password")
-def update_user_password_route(user_data: UserUpdatePassword):
+def update_user_password_route(
+    user_data: UserUpdatePassword, _: None = Depends(require_token_valid)
+):
     """Update password of user"""
 
     return update_user_password(user_data=user_data)
+
+
+@router.patch("/users/montlhy_revenue")
+def update_monthly_revenue_route(
+    user_id: int, new_monthly_revenue: float, _: None = Depends(require_token_valid)
+):
+    """Update monthly revenue of user"""
+
+    return update_monthly_revenue(
+        monthly_revenue=new_monthly_revenue, user_id=UserIdentifier(id=user_id)
+    )

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, DateTime, Float, String, Integer, Date, ForeignKey
+from sqlalchemy import Column, DateTime, String, Integer, Date, ForeignKey, Numeric
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -13,7 +13,7 @@ class Expense(BASE):
     name = Column(String, nullable=False)
     created_at = Column(DateTime, nullable=False, default=func.now())
     day = Column(Date, nullable=False)
-    value = Column(Float, nullable=False)
+    value = Column(Numeric, nullable=False)
     card = Column(String, nullable=False)
     payment_type = Column(String, nullable=False)
 

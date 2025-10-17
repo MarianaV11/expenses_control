@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel
@@ -33,3 +34,11 @@ class ExpensesList(BaseModel):
     total_page: int
     total_expenses: int
     expenses: list[ExpenseRead]
+
+
+class ExpensesStatus(BaseModel):
+    monthly_revenue: Decimal
+    remaining_value: Decimal
+    total_expenses: Decimal
+
+    model_config = {"from_attributes": True}

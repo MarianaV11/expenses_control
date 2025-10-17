@@ -7,7 +7,12 @@ from schemas.expense_schema import (
     ExpenseRead,
     ExpensesList,
     ExpenseUpdate,
+    ExpensesStatus,
 )
+from decimal import Decimal
+from sqlalchemy.sql import func, extract
+from datetime import datetime
+from models.user import User
 
 
 def create_expense(expense: ExpenseCreate) -> ExpenseRead:
@@ -185,6 +190,42 @@ def update_expense(expense_data: ExpenseUpdate) -> ExpenseRead | JSONResponse:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"An error occurred when trying to update an expense: {e}.",
+        )
+    finally:
+        db.close()
+
+
+def get_monthly_status(user_id: int) -> ExpensesStatus:
+    db = SessionLocal()
+
+    try:
+        now = datetime.now()
+        current_month = now.month
+        current_year = now.year
+
+        expense_total = db.query(func.sum(Expense.value)).filter(
+            Expense.user_id == user_id
+        ).filter(extract("month", Expense.day) == current_month).filter(
+            extract("year", Expense.day) == current_year
+        ).scalar() or Decimal("0.00")
+
+        user_current_revenue = db.query(User.monthly_revenue).filter(
+            User.id == user_id
+        ).scalar() or Decimal("0.00")
+
+        balance = user_current_revenue - expense_total
+
+        return ExpensesStatus(
+            monthly_revenue=user_current_revenue,
+            remaining_value=balance,
+            total_expenses=expense_total,
+        )
+    except Exception as e:
+        db.rollback()
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An error occurred when trying to get sum of monthly expenses: {e}.",
         )
     finally:
         db.close()

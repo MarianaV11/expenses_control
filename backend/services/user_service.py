@@ -13,6 +13,7 @@ from schemas.user_schema import (
 )
 from utils.auth import create_access_token
 from utils.security import hash_password, verify_password
+from decimal import Decimal
 
 
 def create_user(user_data: UserCreate) -> UserLoginReturn | JSONResponse:
@@ -204,6 +205,40 @@ def update_user_password(user_data: UserUpdatePassword) -> JSONResponse:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"An error occured when trying to update an user password: {e}",
+        )
+    finally:
+        db.close()
+
+
+def update_monthly_revenue(
+    user_id: UserIdentifier, monthly_revenue: Decimal
+) -> JSONResponse:
+    db = SessionLocal()
+
+    try:
+        user = db.query(User).filter(User.id == user_id.id).first()
+
+        if not user:
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"message": "Current user not found in our database."},
+            )
+
+        user.monthly_revenue = monthly_revenue
+
+        db.commit()
+        db.refresh(user)
+
+        return JSONResponse(
+            content={"message": "Monthly revenue updated successfully!"},
+            status_code=status.HTTP_200_OK,
+        )
+    except Exception as e:
+        db.rollback()
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An error occured when trying to update an user data: {e}",
         )
     finally:
         db.close()
