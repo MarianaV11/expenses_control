@@ -65,7 +65,7 @@ def update_user_password_route(
     return update_user_password(user_data=user_data)
 
 
-@router.patch("/users/montlhy_revenue")
+@router.patch("/users/monthly_revenue")
 def update_monthly_revenue_route(
     user_id: int, new_monthly_revenue: float, _: None = Depends(require_token_valid)
 ):

@@ -1,6 +1,6 @@
 "use client";
 
-import StyledRegisterButton from "@/components/external/button";
+import StyledRegisterButton from "@/components/external/Button";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {

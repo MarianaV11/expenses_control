@@ -1,6 +1,6 @@
 "use client";
 
-import Button from "@/components/external/button";
+import Button from "@/components/external/Button";
 import {
   Form,
   FormControl,

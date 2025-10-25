@@ -12,7 +12,7 @@ import { axios } from "@/service/axios_config";
 import { getUser } from "@/service/local_storage";
 import { UserIdentifier, UserRead } from "@/types/user";
 import { useCallback, useEffect, useState } from "react";
-import SwitchTheme from "../../external/switch_theme";
+import SwitchTheme from "../../external/SwitchTheme";
 
 export function Navbar() {
   const [user, setUser] = useState<UserRead | null>(null);

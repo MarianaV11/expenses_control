@@ -1,6 +1,7 @@
 import { ThemeProvider } from "@/components/ui/theme_provider";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Lora } from "next/font/google";
+import { ToastContainer } from "react-toastify";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -35,6 +36,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${geistLora.variable}`}
     >
       <body className="bg-background">
+        <ToastContainer />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
