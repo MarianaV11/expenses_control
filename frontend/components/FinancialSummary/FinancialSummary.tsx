@@ -41,7 +41,7 @@ const FinancialSummary = () => {
   }, []);
 
   return (
-    <div className="grid relative grid-cols-1 md:grid-cols-3 gap-6 p-5 pt-12 rounded-lg border">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-12 p-5 relative rounded-lg border">
       <CommonDialog
         className="absolute top-2 right-2"
         content={
@@ -62,7 +62,7 @@ const FinancialSummary = () => {
       />
       <Card className="p-6 hover:shadow-lg transition-all duration-300 border-l-4 border-l-primary">
         <div className="flex items-center justify-between">
-          <div>
+          <div className="w-full max-w-xs break-words overflow-hidden">
             <p className="text-sm text-muted-foreground mb-1">
               Monthly Revenue
             </p>
@@ -72,7 +72,7 @@ const FinancialSummary = () => {
                 : "R$ 0,00"}
             </p>
           </div>
-          <div className="p-3 rounded-full bg-gradient-primary">
+          <div className="p-3 rounded-full bg-gradient-primary max-md:hidden">
             <DollarSign className="w-6 h-6 text-white" />
           </div>
         </div>
@@ -80,7 +80,7 @@ const FinancialSummary = () => {
 
       <Card className="p-6 hover:shadow-lg transition-all duration-300 border-l-4 border-l-destructive">
         <div className="flex items-center justify-between">
-          <div>
+          <div className="w-full max-w-xs break-words overflow-hidden">
             <p className="text-sm text-muted-foreground mb-1">
               Monthly Expenses
             </p>
@@ -90,7 +90,7 @@ const FinancialSummary = () => {
                 : "R$ 0,00"}
             </p>
           </div>
-          <div className="p-3 rounded-full bg-gradient-danger">
+          <div className="p-3 rounded-full bg-gradient-danger max-md:hidden">
             <TrendingDown className="w-6 h-6 text-white" />
           </div>
         </div>
@@ -98,7 +98,7 @@ const FinancialSummary = () => {
 
       <Card className="p-6 hover:shadow-lg transition-all duration-300 border-l-4 border-l-success">
         <div className="flex items-center justify-between">
-          <div>
+          <div className="w-full max-w-xs break-words overflow-hidden">
             <p className="text-sm text-muted-foreground mb-1">
               Remaining Balance
             </p>
@@ -113,7 +113,7 @@ const FinancialSummary = () => {
             </p>
           </div>
           <div
-            className={`p-3 rounded-full ${
+            className={`p-3 rounded-full max-md:hidden ${
               300 >= 0 ? "bg-gradient-success" : "bg-gradient-danger"
             }`}
           >

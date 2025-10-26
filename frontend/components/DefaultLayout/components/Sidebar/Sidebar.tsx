@@ -41,18 +41,25 @@ const Sidebar = () => {
   return (
     <aside
       className={cn(
-        expanded ? "w-64" : "w-min",
-        "transition delay-150 duration-300 ease-in-out"
+        "transition-all duration-300 ease-in-out transform",
+        expanded
+          ? "max-sm:fixed translate-x-0 max-sm:top-0 max-sm:left-0 max-sm:h-full bg-background/90 max-sm:w-full max-sm:z-50 w-64"
+          : "w-[80px] max-sm:translate-x-0 translate-x-0"
       )}
     >
-      <nav
-        className={cn(
-          "h-[100%] flex flex-col border-r shadow-sm",
-          expanded && ""
-        )}
-      >
-        <div className="p-4 pb-2 flex justify-between items-center">
-          <h1 className={cn("text-xl text-shadow-md", !expanded && "hidden")}>
+      <div className={cn("h-[100%] flex flex-col border-r shadow-sm")}>
+        <div
+          className={cn(
+            "p-4 pb-4 flex justify-center items-center transition-all duration-75",
+            expanded && "justify-between"
+          )}
+        >
+          <h1
+            className={cn(
+              "text-xl duration-300 text-nowrap transition-colors font-medium",
+              !expanded && "opacity-0 max-w-0 -z-10 "
+            )}
+          >
             Expenses Control
           </h1>
           <Button
@@ -64,7 +71,9 @@ const Sidebar = () => {
           </Button>
         </div>
 
-        <ul className="flex-1 px-3">
+        <hr />
+
+        <div className="flex-1 p-4">
           <SidebarItem
             icon={<HandCoins />}
             text="Current Month"
@@ -80,9 +89,14 @@ const Sidebar = () => {
             text="History of Spending"
             showItem={expanded}
           />
-        </ul>
+        </div>
 
-        <div className="flex p-3 items-center border-t">
+        <div
+          className={cn(
+            "flex p-3 items-center border-t transition-all duration-300 ease-in-out transform",
+            !expanded && "justify-center"
+          )}
+        >
           {profile ? (
             <div className="w-10 h-10 relative overflow-hidden rounded-full flex-shrink-0">
               <Image
@@ -98,19 +112,20 @@ const Sidebar = () => {
           )}
           <div
             className={cn(
-              "flex justify-between items-center overflow-hidden transition-all duration-300",
-              expanded ? "ml-3 opacity-100" : "max-w-0 opacity-0"
+              expanded
+                ? "flex justify-between items-center overflow-hidden transition-all duration-300 ml-3 opacity-100"
+                : "max-w-0 opacity-0"
             )}
           >
             <div className="leading-4">
               <h4 className="font-semiboldy">Mariana Vieira</h4>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-gray-300">
                 marianavieiracostaarauj@gmail.com
               </span>
             </div>
           </div>
         </div>
-      </nav>
+      </div>
     </aside>
   );
 };

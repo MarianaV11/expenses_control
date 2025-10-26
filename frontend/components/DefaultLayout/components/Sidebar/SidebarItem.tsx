@@ -17,18 +17,26 @@ const SidebarItem = ({
   onClick,
 }: SidebarItemProps) => {
   return (
-    <li
+    <div
       onClick={onClick}
       className={cn(
-        "relative flex items-center py-2 px-3 my-1 font-medium rounded-md cursor-pointer transition-colors",
+        "relative flex items-center py-2 px-2 font-medium rounded-md cursor-pointer transition-colors",
         active
-          ? "bg-gradient-to-tr from-primary to-indigo-100 text-white"
-          : "hover:bg-indigo-50 text-gray-600 dark:hover:bg-card dark:text-slate-300"
+          ? "border"
+          : "hover:bg-indigo-50 hover:scale-105 text-gray-600 dark:hover:bg-card dark:text-slate-300",
+        !showItem && "justify-center"
       )}
     >
-      {icon}
-      <span className={cn("w-52 ml-3", !showItem && "hidden")}>{text}</span>
-    </li>
+      <span className="flex justify-center items-center">{icon}</span>
+      <p
+        className={cn(
+          "text-nowrap transition-all duration-300 overflow-hidden",
+          showItem ? "w-52 opacity-100 ml-3" : "w-0 opacity-0"
+        )}
+      >
+        {text}
+      </p>
+    </div>
   );
 };
 

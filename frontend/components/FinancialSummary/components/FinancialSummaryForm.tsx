@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { DialogClose } from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -93,9 +94,11 @@ const FinancialSummaryForm = ({
           )}
         />
         <div className="w-full flex justify-end">
-          <Button className="w-20" type="submit">
-            Save
-          </Button>
+          <DialogClose asChild>
+            <Button className="w-20" type="submit">
+              Save
+            </Button>
+          </DialogClose>
         </div>
       </form>
     </Form>
