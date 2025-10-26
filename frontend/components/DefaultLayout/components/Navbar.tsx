@@ -11,10 +11,21 @@ import {
 import { axios } from "@/service/axios_config";
 import { getUser } from "@/service/local_storage";
 import { UserIdentifier, UserRead } from "@/types/user";
-import { useCallback, useEffect, useState } from "react";
-import SwitchTheme from "../../external/SwitchTheme";
+import { Menu, XIcon } from "lucide-react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 
-export function Navbar() {
+interface NavbarProps {
+  setExpanded: Dispatch<SetStateAction<boolean>>;
+  expanded: boolean;
+}
+
+export function Navbar({ expanded, setExpanded }: NavbarProps) {
   const [user, setUser] = useState<UserRead | null>(null);
 
   const getUserInfo = useCallback(() => {
@@ -38,7 +49,14 @@ export function Navbar() {
 
   return (
     <nav className="p-2 border-b sticky top-0 z-50 flex justify-between items-center mb-0">
-      <SwitchTheme />
+      {/* <SwitchTheme /> TODO: Remove this switch theme. */}
+      <Button
+        className="rounded-lg cursor-pointer border-zing-400 border bg-card"
+        variant="ghost"
+        onClick={() => setExpanded((current) => !current)}
+      >
+        {expanded ? <XIcon /> : <Menu />}
+      </Button>
       <div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

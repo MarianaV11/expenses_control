@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { axios } from "@/service/axios_config";
@@ -13,12 +11,22 @@ import {
   User,
 } from "lucide-react";
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import SidebarItem from "./SidebarItem";
 
-const Sidebar = () => {
+interface SidebarProps {
+  setExpanded: Dispatch<SetStateAction<boolean>>;
+  expanded: boolean;
+}
+
+const Sidebar = ({ expanded, setExpanded }: SidebarProps) => {
   const [profile, setProfile] = useState<string | null>(null);
-  const [expanded, setExpanded] = useState<boolean>(true);
 
   const getUserImage = useCallback(async () => {
     const userId: string | null = getUser();
@@ -50,28 +58,29 @@ const Sidebar = () => {
       <div className={cn("h-[100%] flex flex-col border-r shadow-sm")}>
         <div
           className={cn(
-            "p-4 pb-4 flex justify-center items-center transition-all duration-75",
-            expanded && "justify-between"
+            "flex justify-center items-center transition-all duration-75",
+            expanded && "p-4 pb-4 border-b justify-between"
           )}
         >
           <h1
             className={cn(
               "text-xl duration-300 text-nowrap transition-colors font-medium",
-              !expanded && "opacity-0 max-w-0 -z-10 "
+              !expanded && "opacity-0 max-h-0 max-w-0 -z-10"
             )}
           >
             Expenses Control
           </h1>
           <Button
-            className="rounded-lg cursor-pointer border-zing-400 border bg-card"
+            className={cn(
+              "rounded-lg cursor-pointer border-zing-400 border bg-card",
+              expanded ? "hidden max-sm:block" : "hidden"
+            )}
             variant="ghost"
             onClick={() => setExpanded((current) => !current)}
           >
             {expanded ? <ChevronFirst /> : <ChevronLast />}
           </Button>
         </div>
-
-        <hr />
 
         <div className="flex-1 p-4">
           <SidebarItem
