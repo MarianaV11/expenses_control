@@ -22,6 +22,7 @@ export type Expense = {
   day: string;
   card: string;
   payment_type: string;
+  id: number;
 };
 
 export const columns: ColumnDef<Expense>[] = [
