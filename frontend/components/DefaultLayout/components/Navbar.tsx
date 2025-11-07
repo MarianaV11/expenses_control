@@ -10,7 +10,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { axios } from "@/service/axios_config";
 import { getUser } from "@/service/local_storage";
+import { showErrorToast } from "@/service/toast_service";
 import { UserIdentifier, UserRead } from "@/types/user";
+import { AxiosError } from "axios";
 import { Menu, XIcon } from "lucide-react";
 import {
   Dispatch,
@@ -39,7 +41,9 @@ export function Navbar({ expanded, setExpanded }: NavbarProps) {
       axios
         .get(`/users/user`, { params: body })
         .then((response) => setUser(response.data))
-        .catch((error) => console.log(error));
+        .catch((error: AxiosError) =>
+          showErrorToast({ message: String(error) })
+        );
     }
   }, []);
 

@@ -4,12 +4,13 @@ import { Card } from "@/components/ui/card";
 import { axios } from "@/service/axios_config";
 import { getUser } from "@/service/local_storage";
 import { MonthlyStatus } from "@/types/expenses";
-import { AxiosResponse } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { DollarSign, Edit, TrendingDown, TrendingUp } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import CommonDialog from "../external/CommonDialog";
 import { Button } from "../ui/button";
 import FinancialSummaryForm from "./components/FinancialSummaryForm";
+import { showErrorToast } from "@/service/toast_service";
 
 const FinancialSummary = () => {
   const [monthlyStatus, setMonthlyStatus] = useState<MonthlyStatus>();
@@ -24,8 +25,8 @@ const FinancialSummary = () => {
       .then((response: AxiosResponse<MonthlyStatus>) => {
         setMonthlyStatus(response.data);
       })
-      .catch((error) => {
-        console.error("Error fetching monthly status:", error);
+      .catch((error: AxiosError) => {
+        showErrorToast({ message: String(error) });
       });
   }, []);
 

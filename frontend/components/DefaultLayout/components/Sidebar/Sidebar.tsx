@@ -19,6 +19,8 @@ import {
   useState,
 } from "react";
 import SidebarItem from "./SidebarItem";
+import { showErrorToast } from "@/service/toast_service";
+import { AxiosError } from "axios";
 
 interface SidebarProps {
   setExpanded: Dispatch<SetStateAction<boolean>>;
@@ -38,7 +40,9 @@ const Sidebar = ({ expanded, setExpanded }: SidebarProps) => {
           const url = URL.createObjectURL(response.data);
           setProfile(url);
         })
-        .catch((error) => console.log(error));
+        .catch((error: AxiosError) =>
+          showErrorToast({ message: String(error) })
+        );
     }
   }, []);
 
