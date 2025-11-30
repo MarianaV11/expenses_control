@@ -1,44 +1,26 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { axios } from "@/service/axios_config";
-import { getUser } from "@/service/local_storage";
 import { MonthlyStatus } from "@/types/expenses";
-import { AxiosResponse } from "axios";
+import { formatCurrency } from "@/utils/currency";
 import { DollarSign, Edit, TrendingDown, TrendingUp } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
 import CommonDialog from "../external/CommonDialog";
 import { Button } from "../ui/button";
 import FinancialSummaryForm from "./components/FinancialSummaryForm";
 
-const FinancialSummary = () => {
-  const [monthlyStatus, setMonthlyStatus] = useState<MonthlyStatus>();
+interface FinancialSummaryProps {
+  getMonthlyStatus: () => Promise<void>;
+  monthlyStatus: MonthlyStatus | undefined;
+}
 
-  const getMonthlyStatus = useCallback(async () => {
-    axios
-      .get(`/expenses/monthly_status`, {
-        params: {
-          user_id: getUser(),
-        },
-      })
-      .then((response: AxiosResponse<MonthlyStatus>) => {
-        setMonthlyStatus(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching monthly status:", error);
-      });
-  }, []);
-
+const FinancialSummary = ({
+  getMonthlyStatus,
+  monthlyStatus,
+}: FinancialSummaryProps) => {
   useEffect(() => {
     getMonthlyStatus();
   }, [getMonthlyStatus]);
-
-  const formatCurrency = useCallback((value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
-  }, []);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-12 p-5 relative rounded-lg border">

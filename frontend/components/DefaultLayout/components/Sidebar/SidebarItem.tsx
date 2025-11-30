@@ -27,10 +27,10 @@ const SidebarItem = ({
         !showItem && "justify-center"
       )}
     >
-      <span className="flex justify-center items-center">{icon}</span>
+      <span className="flex justify-center items-center w-5 h-5">{icon}</span>
       <p
         className={cn(
-          "text-nowrap transition-all duration-300 overflow-hidden",
+          "text-nowrap text-sm transition-all duration-300 overflow-hidden",
           showItem ? "w-52 opacity-100 ml-3" : "w-0 opacity-0"
         )}
       >

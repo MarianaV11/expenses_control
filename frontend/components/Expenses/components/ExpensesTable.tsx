@@ -23,6 +23,8 @@ export type Expense = {
   card: string;
   payment_type: string;
   id: number;
+  label_name: string;
+  label_color: string;
 };
 
 export const columns: ColumnDef<Expense>[] = [
@@ -45,6 +47,10 @@ export const columns: ColumnDef<Expense>[] = [
   {
     accessorKey: "payment_type",
     header: "Payment Type",
+  },
+  {
+    accessorKey: "label_name",
+    header: "Label",
   },
 ];
 

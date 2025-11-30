@@ -12,6 +12,7 @@ class Label(BASE):
 
     name = Column(String, nullable=False)
     created_at = Column(DateTime, nullable=False, default=func.now())
+    color = Column(String, nullable=False)
 
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     user = relationship("User", back_populates="labels")

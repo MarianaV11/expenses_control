@@ -22,3 +22,11 @@ class Expense(BASE):
 
     label_id = Column(Integer, ForeignKey("labels.id"), nullable=True)
     label = relationship("Label", back_populates="expenses")
+
+    @property
+    def label_name(self):
+        return self.label.name if self.label else None
+
+    @property
+    def label_color(self):
+        return self.label.color if self.label else None

@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { axiosLogin } from "@/service/axios_config";
 import { removeToken, setToken } from "@/service/local_storage";
+import { showErrorToast } from "@/service/toast_service";
 import { AuthRequest, AuthResponse } from "@/types/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AxiosError, AxiosResponse } from "axios";
@@ -50,7 +51,9 @@ const LoginForm = () => {
       };
 
       const onError = (error: AxiosError) => {
-        console.error(error);
+        const data = error.response?.data as { message?: string };
+
+        showErrorToast({ message: data?.message ?? `${error}` });
       };
 
       const body: AuthRequest = {

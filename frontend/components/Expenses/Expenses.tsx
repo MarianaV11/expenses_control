@@ -14,22 +14,31 @@ import { showErrorToast, showSuccessToast } from "@/service/toast_service";
 import { Expenses as ExpensesType } from "@/types/expenses";
 import { Pagination } from "@/types/general";
 import { ColumnDef } from "@tanstack/react-table";
-import { Axios, AxiosError, AxiosResponse } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { format, toZonedTime } from "date-fns-tz";
-import { MoreHorizontal } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { MoreHorizontal, Plus } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import CommonDialog from "../external/CommonDialog";
+import { Badge } from "../ui/badge";
+import ExpensesForm from "./components/ExpensesForm";
 import ExpensesTable, {
   Expense as ExpenseColumnType,
 } from "./components/ExpensesTable";
 
-const Expenses = () => {
+interface ExpensesProps {
+  getMonthlyStatus: () => Promise<void>;
+}
+
+const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
   const [pagination, setPagination] = useState<Pagination>({
     page: 1,
     per_page: 10,
   });
-  const [data, setData] = useState<ExpenseColumnType[]>([]);
 
-  const getExpenses = useCallback(async () => {
+  const [data, setData] = useState<ExpenseColumnType[]>([]);
+  const [objectData, setObjectData] = useState<ExpensesType>();
+
+  const getExpenses = async () => {
     axios
       .get("/expenses/user_expenses", {
         params: {
@@ -41,25 +50,48 @@ const Expenses = () => {
       .then((response: AxiosResponse<ExpensesType>) => {
         const data = response.data;
 
-        setData(() =>
-          data.expenses.map(
-            (expense): ExpenseColumnType => ({
-              name: expense.name,
-              value: expense.value,
-              day: expense.day,
-              card: expense.card,
-              payment_type: expense.payment_type,
-              id: expense.id,
-            })
-          )
-        );
+        if (data) {
+          setData(
+            data.expenses.map(
+              (expense): ExpenseColumnType => ({
+                name: expense.name,
+                value: expense.value,
+                day: expense.day,
+                card: expense.card,
+                payment_type: expense.payment_type,
+                id: expense.id,
+                label_name: expense.label_name,
+                label_color: expense.label_color,
+              })
+            )
+          );
+
+          setObjectData(data);
+          getMonthlyStatus();
+        }
       })
       .catch((error: AxiosError) => showErrorToast({ message: error.message }));
-  }, []);
+  };
 
   useEffect(() => {
     getExpenses();
-  }, []);
+  }, [pagination]);
+
+  const deleteExpense = (id: number) => {
+    axios
+      .delete("/expenses/delete_expense", {
+        params: { expense_id: id },
+      })
+      .then((response: AxiosResponse) => {
+        setData((prev) => prev.filter((item) => item.id !== id));
+
+        showSuccessToast({ message: response.data.message });
+
+        getExpenses();
+        getMonthlyStatus();
+      })
+      .catch((error: AxiosError) => showErrorToast({ message: error.message }));
+  };
 
   const columns = useMemo<ColumnDef<ExpenseColumnType>[]>(
     () => [
@@ -70,13 +102,9 @@ const Expenses = () => {
             Name
           </div>
         ),
-        cell: ({ row }) => {
-          return (
-            <div className="text-center font-medium">
-              {row.getValue("name")}
-            </div>
-          );
-        },
+        cell: ({ row }) => (
+          <div className="text-center font-medium">{row.getValue("name")}</div>
+        ),
       },
       {
         accessorKey: "value",
@@ -118,13 +146,9 @@ const Expenses = () => {
             Card
           </div>
         ),
-        cell: ({ row }) => {
-          return (
-            <div className="text-center font-medium">
-              {row.getValue("card")}
-            </div>
-          );
-        },
+        cell: ({ row }) => (
+          <div className="text-center font-medium">{row.getValue("card")}</div>
+        ),
       },
       {
         accessorKey: "payment_type",
@@ -133,64 +157,125 @@ const Expenses = () => {
             Payment Type
           </div>
         ),
+        cell: ({ row }) => (
+          <div className="text-center font-medium">
+            {row.getValue("payment_type")}
+          </div>
+        ),
+      },
+      {
+        accessorKey: "label_name",
+        header: () => (
+          <div className="text-center font-extrabold dark:text-slate-300">
+            Label
+          </div>
+        ),
         cell: ({ row }) => {
           return (
             <div className="text-center font-medium">
-              {row.getValue("payment_type")}
+              <Badge
+                variant="outline"
+                style={{ backgroundColor: row.original.label_color }}
+                className="border dark:hover:opacity-60"
+              >
+                <p className="text-white">
+                  {row.getValue("label_name") ?? "No label"}
+                </p>
+              </Badge>
             </div>
           );
         },
       },
       {
         id: "actions",
-        parentId: "id",
-        cell: ({ row }) => {
-          return (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">Edit</span>
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => console.log("click")}>
-                  Edit
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => console.log(row.getValue("id"))}
-                  className="font-bold text-red-700"
-                >
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          );
-        },
+        cell: ({ row }) => (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => console.log("edit")}>
+                Edit
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItem
+                onClick={() => deleteExpense(row.original.id)}
+                className="font-bold text-red-700"
+              >
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ),
       },
     ],
-    []
+    [deleteExpense]
   );
-
-  const deleteExpense = useCallback((id: number) => {
-    axios
-      .delete("/expenses/delete_expense", {
-        params: {
-          expense_id: id,
-        },
-      })
-      .then((response: AxiosResponse) =>
-        showSuccessToast({ message: response.data })
-      )
-      .catch((error: AxiosError) => showErrorToast({ message: error.message }));
-  }, []);
 
   return (
     <div>
       <div className="rounded-md border p-2 shadow-sm">
-        <h1 className="text-center font-bold text-2xl mb-2">Expenses</h1>
-        <ExpensesTable columns={columns} data={data} />
+        <div className="flex justify-between p-2">
+          <h1 className="text-center font-bold text-2xl mb-2">Expenses</h1>
+
+          <CommonDialog
+            content={<ExpensesForm getExpenses={getExpenses} />}
+            description="Create a new expense to add in the table here."
+            title="Add new expense"
+            openButton={
+              <Button size="icon">
+                <Plus />
+              </Button>
+            }
+          />
+        </div>
+
+        <ExpensesTable
+          key={
+            data.length === 0 ? "empty" : JSON.stringify(data.map((d) => d.id))
+          }
+          columns={columns}
+          data={data}
+        />
+
+        <div className="flex items-center justify-end space-x-2 py-4 flex-1">
+          <div className="space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                setPagination((current) => ({
+                  ...current,
+                  page: current.page - 1,
+                }))
+              }
+              disabled={pagination.page === 1 || !objectData}
+            >
+              Previous
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                setPagination((current) => ({
+                  ...current,
+                  page: current.page + 1,
+                }))
+              }
+              disabled={
+                pagination.page === objectData?.total_page || !objectData
+              }
+            >
+              Next
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
