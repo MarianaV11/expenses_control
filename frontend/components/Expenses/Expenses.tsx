@@ -11,7 +11,7 @@ import {
 import { axios } from "@/service/axios_config";
 import { getUser } from "@/service/local_storage";
 import { showErrorToast, showSuccessToast } from "@/service/toast_service";
-import { Expenses as ExpensesType } from "@/types/expenses";
+import { Expense, Expenses as ExpensesType } from "@/types/expenses";
 import { Pagination } from "@/types/general";
 import { ColumnDef } from "@tanstack/react-table";
 import { AxiosError, AxiosResponse } from "axios";
@@ -37,6 +37,8 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
 
   const [data, setData] = useState<ExpenseColumnType[]>([]);
   const [objectData, setObjectData] = useState<ExpensesType>();
+  const [selectedData, setSelectedData] = useState<Expense | null>(null);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
 
   const getExpenses = async () => {
     axios
@@ -197,7 +199,7 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent>
-              <DropdownMenuItem onClick={() => console.log("edit")}>
+              <DropdownMenuItem onClick={() => updateExpense(row.original.id)}>
                 Edit
               </DropdownMenuItem>
 
@@ -217,22 +219,37 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
     [deleteExpense]
   );
 
+  const updateExpense = async (expense_id: number) => {
+    console.log("ok");
+    axios
+      .get("expenses/user_expense", { params: { expense_id: expense_id } })
+      .then((response: AxiosResponse<Expense>) => {
+        const data = response.data;
+
+        setSelectedData(data);
+        setOpenDialog(true);
+      })
+      .catch((error: AxiosError) => showErrorToast({ message: `${error}` }));
+  };
+
+  const closeDialog = () => {
+    setOpenDialog((current) => !current);
+  };
+
   return (
     <div>
       <div className="rounded-md border p-2 shadow-sm">
         <div className="flex justify-between p-2">
           <h1 className="text-center font-bold text-2xl mb-2">Expenses</h1>
-
-          <CommonDialog
-            content={<ExpensesForm getExpenses={getExpenses} />}
-            description="Create a new expense to add in the table here."
-            title="Add new expense"
-            openButton={
-              <Button size="icon">
-                <Plus />
-              </Button>
-            }
-          />
+          <Button
+            size="icon"
+            onClick={() => {
+              setSelectedData(null);
+              setOpenDialog((current) => !current);
+            }}
+          >
+            <Plus />
+          </Button>
         </div>
 
         <ExpensesTable
@@ -277,6 +294,20 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
           </div>
         </div>
       </div>
+
+      <CommonDialog
+        open={openDialog}
+        setOpen={setOpenDialog}
+        content={
+          <ExpensesForm
+            closeDialog={closeDialog}
+            currentExpense={selectedData}
+            getExpenses={getExpenses}
+          />
+        }
+        description="Create a new expense to add in the table here."
+        title="Add new expense"
+      />
     </div>
   );
 };

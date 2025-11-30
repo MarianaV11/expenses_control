@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { MonthlyStatus } from "@/types/expenses";
 import { formatCurrency } from "@/utils/currency";
 import { DollarSign, Edit, TrendingDown, TrendingUp } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import CommonDialog from "../external/CommonDialog";
 import { Button } from "../ui/button";
 import FinancialSummaryForm from "./components/FinancialSummaryForm";
@@ -18,30 +18,25 @@ const FinancialSummary = ({
   getMonthlyStatus,
   monthlyStatus,
 }: FinancialSummaryProps) => {
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+
   useEffect(() => {
     getMonthlyStatus();
   }, [getMonthlyStatus]);
 
+  const closeDialog = () => {
+    setOpenDialog((current) => !current);
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-12 p-5 relative rounded-lg border">
-      <CommonDialog
+      <Button
+        variant="ghost"
         className="absolute top-2 right-2"
-        content={
-          <FinancialSummaryForm
-            getMonthlyStatus={getMonthlyStatus}
-            monthlyRevenue={
-              monthlyStatus ? Number(monthlyStatus?.monthly_revenue) : 0.0
-            }
-          />
-        }
-        description="Change your monthly revenue here."
-        title="Monthly Revenue"
-        openButton={
-          <Button variant="ghost">
-            <Edit size={20} />
-          </Button>
-        }
-      />
+        onClick={() => setOpenDialog((current) => !current)}
+      >
+        <Edit size={20} />
+      </Button>
       <Card className="p-6 hover:shadow-lg transition-all duration-300 border-l-4 border-l-primary">
         <div className="flex items-center justify-between">
           <div className="w-full max-w-xs break-words overflow-hidden">
@@ -103,6 +98,22 @@ const FinancialSummary = ({
           </div>
         </div>
       </Card>
+
+      <CommonDialog
+        open={openDialog}
+        setOpen={setOpenDialog}
+        content={
+          <FinancialSummaryForm
+            closeDialog={closeDialog}
+            getMonthlyStatus={getMonthlyStatus}
+            monthlyRevenue={
+              monthlyStatus ? Number(monthlyStatus?.monthly_revenue) : 0.0
+            }
+          />
+        }
+        description="Change your monthly revenue here."
+        title="Monthly Revenue"
+      />
     </div>
   );
 };

@@ -26,11 +26,13 @@ type FinancialSchemaType = z.infer<typeof FinancialSchema>;
 interface FinancialSummaryFormProps {
   monthlyRevenue: number;
   getMonthlyStatus: () => Promise<void>;
+  closeDialog: () => void;
 }
 
 const FinancialSummaryForm = ({
   monthlyRevenue,
   getMonthlyStatus,
+  closeDialog,
 }: FinancialSummaryFormProps) => {
   const form = useForm<FinancialSchemaType>({
     resolver: zodResolver(FinancialSchema),
@@ -45,6 +47,8 @@ const FinancialSummaryForm = ({
       showSuccessToast({ message: data?.message });
 
       getMonthlyStatus();
+
+      closeDialog();
     };
 
     const onError = (error: AxiosError) => {

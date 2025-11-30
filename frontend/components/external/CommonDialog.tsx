@@ -4,30 +4,27 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 
 interface CommonDialogProps {
   title: string;
-  openButton: React.ReactNode | string;
+  setOpen: Dispatch<SetStateAction<boolean>>;
   content: React.ReactNode;
   className?: string;
   description?: string;
+  open: boolean;
 }
 
 const CommonDialog = ({
+  setOpen,
   title,
-  openButton,
   content,
-  className,
   description,
+  open = false,
 }: CommonDialogProps) => {
   return (
-    <Dialog>
-      <DialogTrigger className={className} asChild>
-        {openButton}
-      </DialogTrigger>
+    <Dialog open={open}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>

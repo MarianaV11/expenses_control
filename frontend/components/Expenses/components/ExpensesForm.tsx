@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { DialogClose } from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -28,7 +27,7 @@ import { cn } from "@/lib/utils";
 import { axios } from "@/service/axios_config";
 import { getUser } from "@/service/local_storage";
 import { showErrorToast, showSuccessToast } from "@/service/toast_service";
-import { Expense, ExpenseCreate } from "@/types/expenses";
+import { Expense, ExpenseCreate, ExpenseUpdate } from "@/types/expenses";
 import { Label } from "@/types/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AxiosError, AxiosResponse } from "axios";
@@ -51,33 +50,51 @@ type ExpensesSchemaType = z.infer<typeof ExpensesSchema>;
 
 interface ExpensesFormProps {
   getExpenses: () => void;
+  currentExpense: Expense | null;
+  closeDialog: () => void;
 }
 
-const ExpensesForm = ({ getExpenses }: ExpensesFormProps) => {
+const ExpensesForm = ({
+  getExpenses,
+  currentExpense,
+  closeDialog,
+}: ExpensesFormProps) => {
   const form = useForm<ExpensesSchemaType>({
     resolver: zodResolver(ExpensesSchema),
     defaultValues: {
-      name: "",
-      value: 0,
-      day: new Date(),
-      card: "",
-      payment_type: "",
-      label_id: null,
+      name: currentExpense?.name ?? "",
+      value: currentExpense?.value ?? 0,
+      day: currentExpense?.day
+        ? new Date(currentExpense.day + "T00:00:00")
+        : new Date(),
+      card: currentExpense?.card ?? "",
+      payment_type: currentExpense?.payment_type ?? "",
+      label_id: String(currentExpense?.label_id) ?? null,
     },
   });
   const [options, setOptions] = useState<Label[]>([]);
+
+  const onSubmit = (values: ExpensesSchemaType) => {
+    if (!currentExpense) {
+      createNewExpense(values);
+    } else {
+      updateExpense(values);
+    }
+  };
 
   const createNewExpense = useCallback((values: ExpensesSchemaType) => {
     const onSuccess = (response: AxiosResponse<Expense>) => {
       getExpenses();
 
       showSuccessToast({ message: "Expense created with success!" });
+      closeDialog();
     };
 
     const onError = (error: AxiosError) => {
       const data = error.response?.data as { message?: string };
 
       showErrorToast({ message: data?.message ?? `${error}` });
+      closeDialog();
     };
 
     console.log(values);
@@ -93,6 +110,35 @@ const ExpensesForm = ({ getExpenses }: ExpensesFormProps) => {
     };
 
     axios.post("expenses/create", body).then(onSuccess).catch(onError);
+  }, []);
+
+  const updateExpense = useCallback((values: ExpensesSchemaType) => {
+    const onSuccess = (response: AxiosResponse<Expense>) => {
+      getExpenses();
+
+      showSuccessToast({ message: "Expense updated with success!" });
+      closeDialog();
+    };
+
+    const onError = (error: AxiosError) => {
+      const data = error.response?.data as { message?: string };
+
+      showErrorToast({ message: data?.message ?? `${error}` });
+      closeDialog();
+    };
+
+    const body: ExpenseUpdate = {
+      id: currentExpense?.id ?? 0,
+      user_id: Number(getUser()) ?? 0,
+      name: values.name,
+      value: values.value,
+      card: values.card,
+      day: new Intl.DateTimeFormat("sv-SE").format(values.day),
+      label_id: values.label_id ? Number(values.label_id) : null,
+      payment_type: values.payment_type,
+    };
+
+    axios.put("expenses/update_expense", body).then(onSuccess).catch(onError);
   }, []);
 
   const getLabels = async () => {
@@ -113,13 +159,26 @@ const ExpensesForm = ({ getExpenses }: ExpensesFormProps) => {
 
   useEffect(() => {
     getLabels();
+    console.log(currentExpense);
+    const apllyColumnInformation: ExpensesSchemaType = {
+      name: currentExpense?.name ?? "",
+      card: currentExpense?.card ?? "",
+      day: currentExpense?.day
+        ? new Date(currentExpense.day + "T00:00:00")
+        : new Date(),
+      label_id: String(currentExpense?.label_id) ?? null,
+      payment_type: currentExpense?.payment_type ?? "",
+      value: currentExpense?.value ?? 0,
+    };
+
+    form.reset(apllyColumnInformation);
   }, []);
 
   return (
     <Form {...form}>
       <form
         className="flex flex-col gap-5"
-        onSubmit={form.handleSubmit(createNewExpense)}
+        onSubmit={form.handleSubmit(onSubmit)}
       >
         <FormField
           control={form.control}
@@ -321,7 +380,12 @@ const ExpensesForm = ({ getExpenses }: ExpensesFormProps) => {
             );
           }}
         />
-        <Button type="submit">Create</Button>
+        <div className="flex justify-end gap-2">
+          <Button type="reset" variant="outline" onClick={() => closeDialog()}>
+            Cancel
+          </Button>
+          <Button type="submit">{currentExpense ? "Update" : "Create"}</Button>
+        </div>
       </form>
     </Form>
   );

@@ -36,3 +36,5 @@ export type ExpenseCreate = {
   payment_type: string;
   label_id: number | null;
 };
+
+export type ExpenseUpdate = ExpenseCreate & ExpenseIdentifier;
