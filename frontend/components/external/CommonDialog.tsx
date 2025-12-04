@@ -25,7 +25,7 @@ const CommonDialog = ({
 }: CommonDialogProps) => {
   return (
     <Dialog open={open}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}

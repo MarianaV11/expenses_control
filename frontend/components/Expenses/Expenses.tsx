@@ -180,9 +180,7 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
                 style={{ backgroundColor: row.original.label_color }}
                 className="border dark:hover:opacity-60"
               >
-                <p className="text-white">
-                  {row.getValue("label_name") ?? "No label"}
-                </p>
+                {row.getValue("label_name") ?? "No label"}
               </Badge>
             </div>
           );
