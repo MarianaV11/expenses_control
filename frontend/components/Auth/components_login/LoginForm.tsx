@@ -51,7 +51,9 @@ const LoginForm = () => {
       };
 
       const onError = (error: AxiosError) => {
-        showErrorToast({ message: String(error) });
+        const data = error.response?.data as { message?: string };
+
+        showErrorToast({ message: data?.message ?? `${error}` });
       };
 
       const body: AuthRequest = {

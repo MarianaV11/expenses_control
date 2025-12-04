@@ -35,7 +35,7 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${geistLora.variable}`}
     >
-      <body className="bg-background">
+      <body className="bg-background" suppressHydrationWarning>
         <ToastContainer />
         <ThemeProvider
           attribute="class"

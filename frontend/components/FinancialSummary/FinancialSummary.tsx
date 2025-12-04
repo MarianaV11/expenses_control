@@ -1,66 +1,42 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { axios } from "@/service/axios_config";
-import { getUser } from "@/service/local_storage";
 import { MonthlyStatus } from "@/types/expenses";
-import { AxiosError, AxiosResponse } from "axios";
+import { formatCurrency } from "@/utils/currency";
 import { DollarSign, Edit, TrendingDown, TrendingUp } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import CommonDialog from "../external/CommonDialog";
 import { Button } from "../ui/button";
 import FinancialSummaryForm from "./components/FinancialSummaryForm";
-import { showErrorToast } from "@/service/toast_service";
 
-const FinancialSummary = () => {
-  const [monthlyStatus, setMonthlyStatus] = useState<MonthlyStatus>();
+interface FinancialSummaryProps {
+  getMonthlyStatus: () => Promise<void>;
+  monthlyStatus: MonthlyStatus | undefined;
+}
 
-  const getMonthlyStatus = useCallback(async () => {
-    axios
-      .get(`/expenses/monthly_status`, {
-        params: {
-          user_id: getUser(),
-        },
-      })
-      .then((response: AxiosResponse<MonthlyStatus>) => {
-        setMonthlyStatus(response.data);
-      })
-      .catch((error: AxiosError) => {
-        showErrorToast({ message: String(error) });
-      });
-  }, []);
+const FinancialSummary = ({
+  getMonthlyStatus,
+  monthlyStatus,
+}: FinancialSummaryProps) => {
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
 
   useEffect(() => {
     getMonthlyStatus();
   }, [getMonthlyStatus]);
 
-  const formatCurrency = useCallback((value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
-  }, []);
+  const closeDialog = () => {
+    setOpenDialog((current) => !current);
+  };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-12 p-5 relative rounded-lg border">
-      <CommonDialog
+      <Button
+        variant="ghost"
         className="absolute top-2 right-2"
-        content={
-          <FinancialSummaryForm
-            getMonthlyStatus={getMonthlyStatus}
-            monthlyRevenue={
-              monthlyStatus ? Number(monthlyStatus?.monthly_revenue) : 0.0
-            }
-          />
-        }
-        description="Change your monthly revenue here."
-        title="Monthly Revenue"
-        openButton={
-          <Button variant="ghost">
-            <Edit size={20} />
-          </Button>
-        }
-      />
+        onClick={() => setOpenDialog((current) => !current)}
+      >
+        <Edit size={20} />
+      </Button>
       <Card className="p-6 hover:shadow-lg transition-all duration-300 border-l-4 border-l-primary">
         <div className="flex items-center justify-between">
           <div className="w-full max-w-xs break-words overflow-hidden">
@@ -122,6 +98,22 @@ const FinancialSummary = () => {
           </div>
         </div>
       </Card>
+
+      <CommonDialog
+        open={openDialog}
+        setOpen={setOpenDialog}
+        content={
+          <FinancialSummaryForm
+            closeDialog={closeDialog}
+            getMonthlyStatus={getMonthlyStatus}
+            monthlyRevenue={
+              monthlyStatus ? Number(monthlyStatus?.monthly_revenue) : 0.0
+            }
+          />
+        }
+        description="Change your monthly revenue here."
+        title="Monthly Revenue"
+      />
     </div>
   );
 };

@@ -8,45 +8,94 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { axios } from "@/service/axios_config";
+import { getUser } from "@/service/local_storage";
+import { showErrorToast, showSuccessToast } from "@/service/toast_service";
+import { Expense, Expenses as ExpensesType } from "@/types/expenses";
+import { Pagination } from "@/types/general";
 import { ColumnDef } from "@tanstack/react-table";
+import { AxiosError, AxiosResponse } from "axios";
 import { format, toZonedTime } from "date-fns-tz";
-import { MoreHorizontal } from "lucide-react";
-import { useMemo } from "react";
-import ExpensesTable, { Expense } from "./components/ExpensesTable";
+import { MoreHorizontal, Plus } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import CommonDialog from "../external/CommonDialog";
+import { Badge } from "../ui/badge";
+import ExpensesForm from "./components/ExpensesForm";
+import ExpensesTable, {
+  Expense as ExpenseColumnType,
+} from "./components/ExpensesTable";
 
-const Expenses = () => {
-  const data = [
-    {
-      name: "Pão",
-      value: 100,
-      day: "2024-01-01",
-      card: "Santander",
-      payment_type: "debit",
-    },
-    {
-      name: "Pão",
-      value: 100,
-      day: "2024-01-01",
-      card: "Santander",
-      payment_type: "debit",
-    },
-    {
-      name: "Pão",
-      value: 100,
-      day: "2024-01-01",
-      card: "Santander",
-      payment_type: "debit",
-    },
-    {
-      name: "Pão",
-      value: 100,
-      day: "2024-01-01",
-      card: "Santander",
-      payment_type: "debit",
-    },
-  ];
+interface ExpensesProps {
+  getMonthlyStatus: () => Promise<void>;
+}
 
-  const columns = useMemo<ColumnDef<Expense>[]>(
+const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
+  const [pagination, setPagination] = useState<Pagination>({
+    page: 1,
+    per_page: 10,
+  });
+
+  const [data, setData] = useState<ExpenseColumnType[]>([]);
+  const [objectData, setObjectData] = useState<ExpensesType>();
+  const [selectedData, setSelectedData] = useState<Expense | null>(null);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+
+  const getExpenses = async () => {
+    axios
+      .get("/expenses/user_expenses", {
+        params: {
+          user_id: getUser(),
+          page: pagination.page,
+          per_page: pagination.per_page,
+        },
+      })
+      .then((response: AxiosResponse<ExpensesType>) => {
+        const data = response.data;
+
+        if (data) {
+          setData(
+            data.expenses.map(
+              (expense): ExpenseColumnType => ({
+                name: expense.name,
+                value: expense.value,
+                day: expense.day,
+                card: expense.card,
+                payment_type: expense.payment_type,
+                id: expense.id,
+                label_name: expense.label_name,
+                label_color: expense.label_color,
+              })
+            )
+          );
+
+          setObjectData(data);
+          getMonthlyStatus();
+        }
+      })
+      .catch((error: AxiosError) => showErrorToast({ message: error.message }));
+  };
+
+  useEffect(() => {
+    getExpenses();
+  }, [pagination]);
+
+  const deleteExpense = (id: number) => {
+    axios
+      .delete("/expenses/delete_expense", {
+        params: { expense_id: id },
+      })
+      .then((response: AxiosResponse) => {
+        setData((prev) => prev.filter((item) => item.id !== id));
+
+        showSuccessToast({ message: response.data.message });
+
+        getExpenses();
+        getMonthlyStatus();
+      })
+      .catch((error: AxiosError) => showErrorToast({ message: error.message }));
+  };
+
+  const columns = useMemo<ColumnDef<ExpenseColumnType>[]>(
     () => [
       {
         accessorKey: "name",
@@ -55,13 +104,9 @@ const Expenses = () => {
             Name
           </div>
         ),
-        cell: ({ row }) => {
-          return (
-            <div className="text-center font-medium">
-              {row.getValue("name")}
-            </div>
-          );
-        },
+        cell: ({ row }) => (
+          <div className="text-center font-medium">{row.getValue("name")}</div>
+        ),
       },
       {
         accessorKey: "value",
@@ -103,13 +148,9 @@ const Expenses = () => {
             Card
           </div>
         ),
-        cell: ({ row }) => {
-          return (
-            <div className="text-center font-medium">
-              {row.getValue("card")}
-            </div>
-          );
-        },
+        cell: ({ row }) => (
+          <div className="text-center font-medium">{row.getValue("card")}</div>
+        ),
       },
       {
         accessorKey: "payment_type",
@@ -118,48 +159,153 @@ const Expenses = () => {
             Payment Type
           </div>
         ),
+        cell: ({ row }) => (
+          <div className="text-center font-medium">
+            {row.getValue("payment_type")}
+          </div>
+        ),
+      },
+      {
+        accessorKey: "label_name",
+        header: () => (
+          <div className="text-center font-extrabold dark:text-slate-300">
+            Label
+          </div>
+        ),
         cell: ({ row }) => {
           return (
             <div className="text-center font-medium">
-              {row.getValue("payment_type")}
+              <Badge
+                variant="outline"
+                style={{ backgroundColor: row.original.label_color }}
+                className="border dark:hover:opacity-60"
+              >
+                {row.getValue("label_name") ?? "No label"}
+              </Badge>
             </div>
           );
         },
       },
       {
         id: "actions",
-        cell: ({ row }) => {
-          return (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">Edit</span>
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => console.log("click")}>
-                  Edit
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="font-bold text-red-700">
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          );
-        },
+        cell: ({ row }) => (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => updateExpense(row.original.id)}>
+                Edit
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItem
+                onClick={() => deleteExpense(row.original.id)}
+                className="font-bold text-red-700"
+              >
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ),
       },
     ],
-    []
+    [deleteExpense]
   );
+
+  const updateExpense = async (expense_id: number) => {
+    console.log("ok");
+    axios
+      .get("expenses/user_expense", { params: { expense_id: expense_id } })
+      .then((response: AxiosResponse<Expense>) => {
+        const data = response.data;
+
+        setSelectedData(data);
+        setOpenDialog(true);
+      })
+      .catch((error: AxiosError) => showErrorToast({ message: `${error}` }));
+  };
+
+  const closeDialog = () => {
+    setOpenDialog((current) => !current);
+  };
 
   return (
     <div>
       <div className="rounded-md border p-2 shadow-sm">
-        <p className="text-center font-bold text-xl mb-2">Expenses</p>
-        <ExpensesTable columns={columns} data={data} />
+        <div className="flex justify-between p-2">
+          <h1 className="text-center font-bold text-2xl mb-2">Expenses</h1>
+          <Button
+            size="icon"
+            onClick={() => {
+              setSelectedData(null);
+              setOpenDialog((current) => !current);
+            }}
+          >
+            <Plus />
+          </Button>
+        </div>
+
+        <ExpensesTable
+          key={
+            data.length === 0 ? "empty" : JSON.stringify(data.map((d) => d.id))
+          }
+          columns={columns}
+          data={data}
+        />
+
+        <div className="flex items-center justify-end space-x-2 py-4 flex-1">
+          <div className="space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                setPagination((current) => ({
+                  ...current,
+                  page: current.page - 1,
+                }))
+              }
+              disabled={pagination.page === 1 || !objectData}
+            >
+              Previous
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                setPagination((current) => ({
+                  ...current,
+                  page: current.page + 1,
+                }))
+              }
+              disabled={
+                pagination.page === objectData?.total_page || !objectData
+              }
+            >
+              Next
+            </Button>
+          </div>
+        </div>
       </div>
+
+      <CommonDialog
+        open={openDialog}
+        setOpen={setOpenDialog}
+        content={
+          <ExpensesForm
+            closeDialog={closeDialog}
+            currentExpense={selectedData}
+            getExpenses={getExpenses}
+          />
+        }
+        description="Create a new expense to add in the table here."
+        title="Add new expense"
+      />
     </div>
   );
 };

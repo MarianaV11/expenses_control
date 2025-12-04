@@ -33,7 +33,7 @@ def create_expense(expense: ExpenseCreate) -> ExpenseRead:
         db.commit()
         db.refresh(new_expense)
 
-        return new_expense
+        return ExpenseRead.model_validate(new_expense)
     except Exception as e:
         db.rollback()
 
@@ -99,7 +99,7 @@ def get_expense(expense_id: int) -> ExpenseRead | JSONResponse:
                 },
             )
 
-        return expense
+        return ExpenseRead.model_validate(expense)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -183,7 +183,7 @@ def update_expense(expense_data: ExpenseUpdate) -> ExpenseRead | JSONResponse:
         db.commit()
         db.refresh(expense)
 
-        return expense
+        return ExpenseRead.model_validate(expense)
     except Exception as e:
         db.rollback()
 

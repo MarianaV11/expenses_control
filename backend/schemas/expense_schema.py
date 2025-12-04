@@ -12,14 +12,28 @@ class ExpenseBase(BaseModel):
     card: str
     payment_type: str
     label_id: Optional[int]
+    label_name: Optional[str]
+    label_color: Optional[str]
 
 
-class ExpenseCreate(ExpenseBase):
+class ExpenseCreate(BaseModel):
     user_id: int
+    name: str
+    value: float
+    day: date
+    card: str
+    payment_type: str
+    label_id: Optional[int]
 
 
-class ExpenseUpdate(ExpenseBase):
+class ExpenseUpdate(BaseModel):
     id: int
+    name: str
+    value: float
+    day: date
+    card: str
+    payment_type: str
+    label_id: Optional[int]
 
 
 class ExpenseRead(ExpenseBase):
