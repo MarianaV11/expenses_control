@@ -151,8 +151,8 @@ const LabelForm = ({
               </FormLabel>
               <FormDescription>Choose your label’s color.</FormDescription>
               <FormControl>
-                <div className="flex gap-2 items-center justify-center">
-                  <div className="flex-grow flex flex-col">
+                <div className="flex max-md:flex-col-reverse gap-2 items-center justify-center">
+                  <div className="flex-grow flex flex-col items-center justify-center">
                     <HexColorPicker
                       color={field.value}
                       onChange={field.onChange}
@@ -166,7 +166,7 @@ const LabelForm = ({
                       <Badge
                         variant="outline"
                         style={{ backgroundColor: currentColor }}
-                        className="border dark:hover:opacity-60 animate-bounce scale-105"
+                        className="border max-md:mt-6 max-md:mb-6 dark:hover:opacity-60 animate-bounce scale-105"
                       >
                         <p>{!name ? "No label" : name}</p>
                       </Badge>
