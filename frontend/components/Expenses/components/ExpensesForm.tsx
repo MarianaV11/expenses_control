@@ -110,8 +110,6 @@ const ExpensesForm = ({
       closeDialog();
     };
 
-    console.log(values);
-
     const body: ExpenseCreate = {
       user_id: Number(getUser()) ?? 0,
       name: values.name,
@@ -193,7 +191,6 @@ const ExpensesForm = ({
 
   useEffect(() => {
     getLabels();
-    console.log(currentExpense);
     const apllyColumnInformation: ExpensesSchemaType = {
       name: currentExpense?.name ?? "",
       card: currentExpense?.card ?? "",

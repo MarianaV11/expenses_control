@@ -218,7 +218,6 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
   );
 
   const updateExpense = async (expense_id: number) => {
-    console.log("ok");
     axios
       .get("expenses/user_expense", { params: { expense_id: expense_id } })
       .then((response: AxiosResponse<Expense>) => {
