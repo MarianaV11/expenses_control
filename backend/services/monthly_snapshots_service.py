@@ -19,8 +19,8 @@ def calculate_month_metrics(
     expenses = (
         db.query(Expense)
         .filter(Expense.user_id == user_id)
-        .filter(Expense.date >= start)
-        .filter(Expense.date <= end)
+        .filter(Expense.day >= start)
+        .filter(Expense.day <= end)
         .all()
     )
 
@@ -73,33 +73,35 @@ def calculate_month_metrics(
     }
 
 
-def create_monthly_snapshot(user_id: int, start: date, end: date):
+def create_monthly_snapshot(start: date, end: date):
     db = SessionLocal()
 
     try:
-        metrics = calculate_month_metrics(db, user_id, start, end)
+        users = db.query(User).all()
 
-        if not metrics:
-            return None
+        for user in users:
+            metrics = calculate_month_metrics(db, user.id, start, end)
 
-        user = db.query(User).filter(User.id == user_id).first()
-        snapshot = MonthlySnapshot(
-            user_id=user_id,
-            current_revenue=user.monthly_revenue,
-            year_month=f"{start.year}-{start.month}",
-            total_spent=metrics["total_spent"],
-            total_by_label=metrics["total_by_label"],
-            percentage_by_label=metrics["percentage_by_label"],
-            total_by_payment_type=metrics["total_by_payment_type"],
-            total_by_card=metrics["total_by_card"],
-            started_at=metrics["started_at"],
-            ended_at=metrics["ended_at"],
-        )
-        db.add(snapshot)
-        db.commit()
-        db.refresh(snapshot)
+            if not metrics:
+                return None
 
-        return snapshot
+            user = db.query(User).filter(User.id == user.id).first()
+            snapshot = MonthlySnapshot(
+                user_id=user.id,
+                current_revenue=user.monthly_revenue,
+                year_month=f"{start.year}-{start.month}",
+                total_spent=metrics["total_spent"],
+                total_by_label=metrics["total_by_label"],
+                percentage_by_label=metrics["percentage_by_label"],
+                total_by_payment_type=metrics["total_by_payment_type"],
+                total_by_card=metrics["total_by_card"],
+                started_at=metrics["started_at"],
+                ended_at=metrics["ended_at"],
+            )
+            db.add(snapshot)
+            db.commit()
+            db.refresh(snapshot)
+
     except Exception as e:
         db.rollback()
 
@@ -138,9 +140,9 @@ def get_monthly_snapshots(
         snapshots = (
             db.query(MonthlySnapshot)
             .filter(MonthlySnapshot.user_id == user_id)
+            .order_by(MonthlySnapshot.year_month.desc())
             .offset(skip)
             .limit(per_page)
-            .order_by(MonthlySnapshot.year_month.desc())
             .all()
         )
 

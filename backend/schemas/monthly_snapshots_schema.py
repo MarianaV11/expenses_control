@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel
 
 
@@ -13,8 +15,8 @@ class MonthlySnapshotRead(MonthlySnapshotBase):
     percentage_by_label: dict
     total_by_payment_type: dict
     total_by_card: dict
-    started_at: str
-    ended_at: str
+    started_at: datetime
+    ended_at: datetime
     user_id: int
 
     model_config = {"from_attributes": True}

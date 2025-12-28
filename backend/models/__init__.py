@@ -4,3 +4,4 @@ from .user import User
 from .expense import Expense
 from .image import Image
 from .label import Label
+from .monthly_snapshots import MonthlySnapshot
