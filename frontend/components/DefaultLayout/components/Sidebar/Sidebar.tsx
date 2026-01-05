@@ -2,15 +2,19 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { axios } from "@/service/axios_config";
 import { getUser } from "@/service/local_storage";
+import { showErrorToast } from "@/service/toast_service";
+import { UserRead } from "@/types/user";
+import { AxiosError } from "axios";
 import {
   ChevronFirst,
   ChevronLast,
   HandCoins,
+  History,
   LayoutDashboardIcon,
-  PiggyBank,
   User,
 } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   Dispatch,
   SetStateAction,
@@ -19,8 +23,6 @@ import {
   useState,
 } from "react";
 import SidebarItem from "./SidebarItem";
-import { showErrorToast } from "@/service/toast_service";
-import { AxiosError } from "axios";
 
 interface SidebarProps {
   setExpanded: Dispatch<SetStateAction<boolean>>;
@@ -28,7 +30,9 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ expanded, setExpanded }: SidebarProps) => {
+  const router = useRouter();
   const [profile, setProfile] = useState<string | null>(null);
+  const [user, setUser] = useState<UserRead | null>(null);
 
   const getUserImage = useCallback(async () => {
     const userId: string | null = getUser();
@@ -40,6 +44,14 @@ const Sidebar = ({ expanded, setExpanded }: SidebarProps) => {
           const url = URL.createObjectURL(response.data);
           setProfile(url);
         })
+        .catch(() => setProfile("/default_user.png"));
+      axios
+        .get(`/users/user`, {
+          params: {
+            user_id: userId,
+          },
+        })
+        .then((response) => setUser(response.data))
         .catch((error: AxiosError) =>
           showErrorToast({ message: String(error) })
         );
@@ -60,23 +72,10 @@ const Sidebar = ({ expanded, setExpanded }: SidebarProps) => {
       )}
     >
       <div className={cn("h-[100%] flex flex-col border-r shadow-sm")}>
-        <div
-          className={cn(
-            "flex justify-center items-center transition-all duration-75",
-            expanded && "p-4 pb-4 border-b justify-between"
-          )}
-        >
-          <h1
-            className={cn(
-              "text-xl duration-300 text-nowrap transition-colors font-medium",
-              !expanded && "opacity-0 max-h-0 max-w-0 -z-10"
-            )}
-          >
-            Expenses Control
-          </h1>
+        <div className="flex justify-end">
           <Button
             className={cn(
-              "rounded-lg cursor-pointer border-zing-400 border bg-card",
+              "rounded-lg cursor-pointer border-zing-400 border bg-card m-2",
               expanded ? "hidden max-sm:block" : "hidden"
             )}
             variant="ghost"
@@ -85,12 +84,12 @@ const Sidebar = ({ expanded, setExpanded }: SidebarProps) => {
             {expanded ? <ChevronFirst /> : <ChevronLast />}
           </Button>
         </div>
-
         <div className="flex-1 p-4">
           <SidebarItem
             icon={<HandCoins />}
             text="Current Month"
             showItem={expanded}
+            onClick={() => router.push("/expense")}
           />
           <SidebarItem
             icon={<LayoutDashboardIcon />}
@@ -98,9 +97,10 @@ const Sidebar = ({ expanded, setExpanded }: SidebarProps) => {
             showItem={expanded}
           />
           <SidebarItem
-            icon={<PiggyBank />}
-            text="History of Spending"
+            icon={<History />}
+            text="Spending History"
             showItem={expanded}
+            onClick={() => router.push("/history")}
           />
         </div>
 
@@ -111,7 +111,7 @@ const Sidebar = ({ expanded, setExpanded }: SidebarProps) => {
           )}
         >
           {profile ? (
-            <div className="w-10 h-10 relative overflow-hidden rounded-full flex-shrink-0">
+            <div className="w-11 h-11 relative overflow-hidden rounded-full flex-shrink-0">
               <Image
                 alt="user_profile"
                 src={profile}
@@ -130,12 +130,14 @@ const Sidebar = ({ expanded, setExpanded }: SidebarProps) => {
                 : "max-w-0 opacity-0"
             )}
           >
-            <div className="leading-4">
-              <h4 className="font-semiboldy">Mariana Vieira</h4>
-              <span className="text-xs text-gray-300">
-                marianavieiracostaarauj@gmail.com
-              </span>
-            </div>
+            {user && (
+              <div className="leading-4">
+                <h4 className="font-semiboldy truncate">
+                  {user.name.split(" ").slice(0, 2).join(" ")}
+                </h4>
+                <p className="text-xs text-gray-400">{user.email}</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

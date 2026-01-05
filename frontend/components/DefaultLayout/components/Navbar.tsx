@@ -9,11 +9,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { axios } from "@/service/axios_config";
-import { getUser } from "@/service/local_storage";
+import { getUser, removeToken } from "@/service/local_storage";
 import { showErrorToast } from "@/service/toast_service";
 import { UserIdentifier, UserRead } from "@/types/user";
 import { AxiosError } from "axios";
 import { Menu, XIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import {
   Dispatch,
   SetStateAction,
@@ -29,6 +30,7 @@ interface NavbarProps {
 
 export function Navbar({ expanded, setExpanded }: NavbarProps) {
   const [user, setUser] = useState<UserRead | null>(null);
+  const router = useRouter();
 
   const getUserInfo = useCallback(() => {
     const userId: string | null = getUser();
@@ -51,9 +53,14 @@ export function Navbar({ expanded, setExpanded }: NavbarProps) {
     getUserInfo();
   }, [getUserInfo]);
 
+  const onLogout = useCallback(() => {
+    removeToken();
+
+    router.push("/");
+  }, []);
+
   return (
     <nav className="p-2 border-b sticky top-0 z-50 flex justify-between items-center mb-0">
-      {/* <SwitchTheme /> TODO: Remove this switch theme. */}
       <Button
         className="rounded-lg cursor-pointer border-zing-400 border bg-card"
         variant="ghost"
@@ -68,11 +75,7 @@ export function Navbar({ expanded, setExpanded }: NavbarProps) {
               variant="outline"
               className="rounded-md p-1 flex items-center h-[3rem] "
             >
-              {user ? (
-                <p>{user.name.split(" ").slice(0, 2).join(" ")}</p>
-              ) : (
-                <p>User</p>
-              )}
+              {user && <p>{user.name.split(" ").slice(0, 2).join(" ")}</p>}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56" align="start">
@@ -84,7 +87,9 @@ export function Navbar({ expanded, setExpanded }: NavbarProps) {
             <DropdownMenuSeparator />
             <DropdownMenuItem>Previous Months</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Log out</DropdownMenuItem>
+            <DropdownMenuItem className="text-destructive" onClick={onLogout}>
+              Log out
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

@@ -21,11 +21,12 @@ const CommonDialog = ({
   title,
   content,
   description,
+  className = "",
   open = false,
 }: CommonDialogProps) => {
   return (
     <Dialog open={open}>
-      <DialogContent>
+      <DialogContent className={`${className}`}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}

@@ -30,6 +30,7 @@ const Expense = () => {
   return (
     <DefaultLayout>
       <div className="m-4 flex flex-col gap-4">
+        <h1 className="text-2xl">Expense Log</h1>
         <FinancialSummary
           getMonthlyStatus={getMonthlyStatus}
           monthlyStatus={monthlyStatus}

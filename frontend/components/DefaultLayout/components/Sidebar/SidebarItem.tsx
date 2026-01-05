@@ -23,7 +23,7 @@ const SidebarItem = ({
         "relative flex items-center py-2 px-2 font-medium rounded-md cursor-pointer transition-colors",
         active
           ? "border"
-          : "hover:bg-indigo-50 hover:scale-105 text-gray-600 dark:hover:bg-card dark:text-slate-300",
+          : "hover:bg-indigo-50 hover:scale-105 transform transition-transform ease-in-out duration-300 text-gray-600 dark:hover:bg-card dark:text-slate-300",
         !showItem && "justify-center"
       )}
     >

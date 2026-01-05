@@ -8,7 +8,7 @@ interface DefaultLayoutProps {
 }
 
 const DefaultLayout = ({ children, className }: DefaultLayoutProps) => {
-  const [expanded, setExpanded] = useState<boolean>(true);
+  const [expanded, setExpanded] = useState<boolean>(false);
 
   return (
     <div className={`h-screen flex flex-col ${className}`}>
