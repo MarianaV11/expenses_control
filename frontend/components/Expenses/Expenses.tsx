@@ -64,8 +64,8 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
                 id: expense.id,
                 label_name: expense.label_name,
                 label_color: expense.label_color,
-              })
-            )
+              }),
+            ),
           );
 
           setObjectData(data);
@@ -135,7 +135,7 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
         cell: ({ row }) => {
           const zonedDate = toZonedTime(
             row.getValue("day"),
-            "America/Sao_Paulo"
+            "America/Sao_Paulo",
           );
           const formatted = format(zonedDate, "dd/MM/yyyy");
           return <div className="text-center font-medium">{formatted}</div>;
@@ -214,7 +214,7 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
         ),
       },
     ],
-    [deleteExpense]
+    [deleteExpense],
   );
 
   const updateExpense = async (expense_id: number) => {
@@ -234,8 +234,8 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
   };
 
   return (
-    <div>
-      <div className="rounded-md border p-2 shadow-sm">
+    <>
+      <div className="rounded-md border p-2 shadow-sm border-t-10 border-primary/50">
         <div className="flex justify-between p-2">
           <h1 className="text-center font-bold text-2xl mb-2">Expenses</h1>
           <Button
@@ -305,7 +305,7 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
         description="Create a new expense to add in the table here."
         title="Add new expense"
       />
-    </div>
+    </>
   );
 };
 

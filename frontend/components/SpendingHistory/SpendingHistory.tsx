@@ -32,7 +32,7 @@ const SpendingHistory = () => {
     axios
       .get("/monthly_snapshots/snapshots", {
         params: {
-          user_id: getUser(),
+          user_id: 8,
           page: pagination.page,
           per_page: pagination.per_page,
         },
@@ -56,7 +56,7 @@ const SpendingHistory = () => {
   };
 
   return (
-    <>
+    <div className="m-4">
       <h1 className="text-2xl">Spending History</h1>
       <h2 className="font-light text-end">
         <span className="font-bold">{monthlySnapshots?.total_snapshots}</span>{" "}
@@ -121,7 +121,7 @@ const SpendingHistory = () => {
           }
         />
       )}
-    </>
+    </div>
   );
 };
 
