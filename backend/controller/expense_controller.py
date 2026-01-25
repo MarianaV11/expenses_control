@@ -4,8 +4,8 @@ from schemas.expense_schema import (
     ExpenseCreate,
     ExpenseRead,
     ExpensesList,
-    ExpenseUpdate,
     ExpensesStatus,
+    ExpenseUpdate,
 )
 from services.expense_service import (
     create_expense,
@@ -13,18 +13,20 @@ from services.expense_service import (
     delete_expenses,
     get_expense,
     get_expenses,
-    update_expense,
     get_monthly_status,
+    update_expense,
 )
 from utils.auth import require_token_valid
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/api/expenses",
+    tags=["Expenses"],
+    dependencies=[Depends(require_token_valid)],
+)
 
 
-@router.post("/expenses/create", response_model=ExpenseRead)
-def create_expense_route(
-    expense: ExpenseCreate, _: None = Depends(require_token_valid)
-):
+@router.post("/create", response_model=ExpenseRead)
+def create_expense_route(expense: ExpenseCreate):
     """
     Create a new expense for a user.
     """
@@ -32,12 +34,9 @@ def create_expense_route(
     return create_expense(expense=expense)
 
 
-@router.get("/expenses/user_expenses", response_model=ExpensesList)
+@router.get("/user_expenses", response_model=ExpensesList)
 def get_expenses_route(
-    user_id: int,
-    page: int = Query(1, ge=1),
-    per_page: int = Query(10, ge=1, le=100),
-    _: None = Depends(require_token_valid),
+    user_id: int, page: int = Query(1, ge=1), per_page: int = Query(10, ge=1, le=100)
 ):
     """
     Get all the expenses of a specific user.
@@ -46,8 +45,10 @@ def get_expenses_route(
     return get_expenses(user_id=user_id, page=page, per_page=per_page)
 
 
-@router.get("/expenses/user_expense", response_model=ExpenseRead)
-def get_expense_route(expense_id: int, _: None = Depends(require_token_valid)):
+@router.get("/user_expense", response_model=ExpenseRead)
+def get_expense_route(
+    expense_id: int,
+):
     """
     Get returned an expense by it's id
     """
@@ -55,10 +56,8 @@ def get_expense_route(expense_id: int, _: None = Depends(require_token_valid)):
     return get_expense(expense_id=expense_id)
 
 
-@router.delete("/expenses/delete_expenses")
-def delete_expenses_route(
-    expense_ids: list[int], _: None = Depends(require_token_valid)
-) -> JSONResponse:
+@router.delete("/delete_expenses")
+def delete_expenses_route(expense_ids: list[int]) -> JSONResponse:
     """
     Receive a list of expense IDs and repeat for all of them, deleting them
     """
@@ -66,10 +65,8 @@ def delete_expenses_route(
     return delete_expenses(expense_ids=expense_ids)
 
 
-@router.delete("/expenses/delete_expense")
-def delete_expense_route(
-    expense_id: int, _: None = Depends(require_token_valid)
-) -> JSONResponse:
+@router.delete("/delete_expense")
+def delete_expense_route(expense_id: int) -> JSONResponse:
     """
     Receive an expense id and delete it.
     """
@@ -77,10 +74,8 @@ def delete_expense_route(
     return delete_expense(expense_id=expense_id)
 
 
-@router.put("/expenses/update_expense", response_model=ExpenseRead)
-def update_expense_route(
-    expense_data: ExpenseUpdate, _: None = Depends(require_token_valid)
-):
+@router.put("/update_expense", response_model=ExpenseRead)
+def update_expense_route(expense_data: ExpenseUpdate):
     """
     Update an expense by its id.
     """
@@ -88,8 +83,8 @@ def update_expense_route(
     return update_expense(expense_data=expense_data)
 
 
-@router.get("/expenses/monthly_status", response_model=ExpensesStatus)
-def get_monthly_status_route(user_id: int, _: None = Depends(require_token_valid)):
+@router.get("/monthly_status", response_model=ExpensesStatus)
+def get_monthly_status_route(user_id: int):
     """
     Get the monthly status.
     """

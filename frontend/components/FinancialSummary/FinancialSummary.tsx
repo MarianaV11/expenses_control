@@ -29,13 +29,13 @@ const FinancialSummary = ({
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-12 p-5 relative rounded-lg border">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-12 p-5 relative rounded-lg border border-t-10 border-primary/50">
       <Button
         variant="ghost"
-        className="absolute top-2 right-2"
+        className="absolute top-2 right-2 border-primary bg-primary/5"
         onClick={() => setOpenDialog((current) => !current)}
       >
-        <Edit size={20} />
+        <Edit size={20} className="text-primary" />
       </Button>
       <Card className="p-6 hover:shadow-lg transition-all duration-300 border-l-4 border-l-primary">
         <div className="flex items-center justify-between">

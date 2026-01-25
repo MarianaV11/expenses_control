@@ -60,3 +60,9 @@ class UserExpenses(UserRead):
 class UserUpdatePassword(UserIdentifier):
     new_password: str
     old_password: str
+
+
+class UpdatePersonalInfo(UserIdentifier):
+    name: str
+    email: str
+    birthday: date

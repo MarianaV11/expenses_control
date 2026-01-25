@@ -179,7 +179,7 @@ const LabelForm = ({
           )}
         />
         <div className="flex justify-end gap-2">
-          <Button type="reset" variant="outline" onClick={() => closeDialog()}>
+          <Button type="button" variant="outline" onClick={() => closeDialog()}>
             Cancel
           </Button>
           <Button type="submit">{currentLabel ? "Update" : "Create"}</Button>

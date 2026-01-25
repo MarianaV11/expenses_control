@@ -19,3 +19,16 @@ export type UserRead = UserIdentifier & {
   is_restricted: boolean;
   is_admin: boolean;
 };
+
+export type UserPersonalInfoUpdate = {
+  id: number;
+  name: string;
+  birthday: string;
+  email: string;
+};
+
+export type UserPasswordUpdate = {
+  id: number;
+  new_password: string;
+  old_password: string;
+};

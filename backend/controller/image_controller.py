@@ -1,26 +1,27 @@
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from fastapi.responses import JSONResponse, StreamingResponse
 from schemas.image_schema import ImageCreate, ImageRead
 from services.image_service import (
     attach_profile,
+    delete_profile,
     get_profile,
     update_profile,
-    delete_profile,
 )
 from utils.auth import require_token_valid
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/api/images", tags=["Images"], dependencies=[Depends(require_token_valid)]
+)
 
 
 ALLOWED_EXTENSIONS = ("jpg", "jpeg", "png", "gif")
 ALLOWED_MIME_TYPES = ("image/jpeg", "image/png", "image/gif")
 
 
-@router.post("/images/profile/create", response_model=ImageRead)
+@router.post("/profile/create/{user_id}", response_model=ImageRead)
 async def attach_profile_route(
-    user_id: int = Form(...),
+    user_id: int,
     file: UploadFile = File(...),
-    _: None = Depends(require_token_valid),
 ):
     """
     This route is responsible to attach a profile image to the user, if the user doesn't have one.
@@ -48,20 +49,17 @@ async def attach_profile_route(
     return attach_profile(image_data=image_schema)
 
 
-@router.get("/images/{user_id}/profile")
-def get_profile_route(
-    user_id: int, _: None = Depends(require_token_valid)
-) -> StreamingResponse:
+@router.get("/{user_id}/profile")
+def get_profile_route(user_id: int) -> StreamingResponse:
     """Get of the profile image of the user"""
 
     return get_profile(user_id=user_id)
 
 
-@router.put("/images/profile/update")
+@router.put("/profile/update/{user_id}")
 async def update_profile_route(
-    user_id: int = Form(...),
+    user_id: int,
     file: UploadFile = File(...),
-    _: None = Depends(require_token_valid),
 ) -> JSONResponse:
     """Update of the user profile picture."""
 
@@ -87,10 +85,8 @@ async def update_profile_route(
     return update_profile(user_id=user_id, image_data=image_schema)
 
 
-@router.delete("/images/profile/delete")
-def delete_profile_route(
-    user_id: int, _: None = Depends(require_token_valid)
-) -> JSONResponse:
+@router.delete("/profile/delete")
+def delete_profile_route(user_id: int) -> JSONResponse:
     """This route will delete the profile picture of the user."""
 
     return delete_profile(user_id=user_id)

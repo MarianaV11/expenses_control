@@ -271,7 +271,7 @@ const ExpensesForm = ({
                         variant={"outline"}
                         className={cn(
                           "w-[100%] pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
+                          !field.value && "text-muted-foreground",
                         )}
                       >
                         {field.value ? (
@@ -375,7 +375,7 @@ const ExpensesForm = ({
             name="label_id"
             render={({ field }) => {
               const selectedLabel = options?.find(
-                (option: Label) => String(option.id) === String(field.value)
+                (option: Label) => String(option.id) === String(field.value),
               );
               return (
                 <FormItem className="w-full">
@@ -467,7 +467,7 @@ const ExpensesForm = ({
           />
           <div className="flex justify-end gap-2">
             <Button
-              type="reset"
+              type="button"
               variant="outline"
               onClick={() => closeDialog()}
             >

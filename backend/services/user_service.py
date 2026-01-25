@@ -10,6 +10,7 @@ from schemas.user_schema import (
     UserLogin,
     UserLoginReturn,
     UserUpdatePassword,
+    UpdatePersonalInfo,
 )
 from utils.auth import create_access_token
 from utils.security import hash_password, verify_password
@@ -231,6 +232,40 @@ def update_monthly_revenue(
 
         return JSONResponse(
             content={"message": "Monthly revenue updated successfully!"},
+            status_code=status.HTTP_200_OK,
+        )
+    except Exception as e:
+        db.rollback()
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An error occured when trying to update an user data: {e}",
+        )
+    finally:
+        db.close()
+
+
+def update_user_info(user_data: UpdatePersonalInfo) -> UserBase | JSONResponse:
+    db = SessionLocal()
+
+    try:
+        user = db.query(User).filter(User.id == user_data.id).first()
+
+        if not user:
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"message": "Current user not found in our database."},
+            )
+
+        user.name = user_data.name
+        user.email = user_data.email
+        user.birthday = user_data.birthday
+
+        db.commit()
+        db.refresh(user)
+
+        return JSONResponse(
+            content={"message": "User personal information updated succesfully!"},
             status_code=status.HTTP_200_OK,
         )
     except Exception as e:

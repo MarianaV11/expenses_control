@@ -48,7 +48,7 @@ const SpendingHistory = () => {
   const setCurrentMonthlySnapshot = (snapshotId: number) => {
     const snapshot: MonthlySnapshot | undefined =
       monthlySnapshots?.snapshots.find(
-        (item: MonthlySnapshot) => item.id === snapshotId
+        (item: MonthlySnapshot) => item.id === snapshotId,
       );
 
     snapshot && setCurrentSnapshot(snapshot);
@@ -57,7 +57,7 @@ const SpendingHistory = () => {
 
   return (
     <div className="m-4">
-      <h1 className="text-2xl">Spending History</h1>
+      <h1 className="text-3xl">Spending History</h1>
       <h2 className="font-light text-end">
         <span className="font-bold">{monthlySnapshots?.total_snapshots}</span>{" "}
         months recorded.

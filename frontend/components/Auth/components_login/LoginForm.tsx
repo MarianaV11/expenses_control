@@ -61,9 +61,9 @@ const LoginForm = () => {
         password: values.password,
       };
 
-      axiosLogin.post("users/login", body).then(onSuccess).catch(onError);
+      axiosLogin.post("auth/login", body).then(onSuccess).catch(onError);
     },
-    [router]
+    [router],
   );
 
   return (

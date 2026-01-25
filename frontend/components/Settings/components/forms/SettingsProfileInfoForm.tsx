@@ -1,6 +1,5 @@
 "use client";
 
-import StyledRegisterButton from "@/components/external/Button";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -18,78 +17,73 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { axiosLogin } from "@/service/axios_config";
-import { removeToken, setToken } from "@/service/local_storage";
-import { showErrorToast } from "@/service/toast_service";
-import { AuthResponse } from "@/types/auth";
-import { UserCreate } from "@/types/user";
+import { axios } from "@/service/axios_config";
+import { getUser } from "@/service/local_storage";
+import { showErrorToast, showSuccessToast } from "@/service/toast_service";
+import { UserPersonalInfoUpdate, UserRead } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AxiosError, AxiosResponse } from "axios";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect } from "react";
+import { CalendarIcon, Save } from "lucide-react";
+import { useCallback } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import z from "zod";
 
-const RegisterSchema = z.object({
+const SettingsProfileInfoSchema = z.object({
   name: z.string().min(1, { message: "Name required!" }),
-  birthdate: z.date({ message: "Birthdate required!" }),
   email: z.email("Email required!"),
-  password: z.string().min(1, { message: "Password required!" }),
+  birthdate: z.date({ message: "Birthdate required!" }),
 });
-type RegisterSchemaType = z.infer<typeof RegisterSchema>;
+type SettingsProfileInfoSchemaType = z.infer<typeof SettingsProfileInfoSchema>;
 
-const RegisterForm = () => {
-  const router = useRouter();
-  const form = useForm<RegisterSchemaType>({
-    resolver: zodResolver(RegisterSchema),
+interface SettingsProfileInfoFormProps {
+  name: string;
+  email: string;
+  birthdate: Date;
+  getUserData: () => void;
+}
+
+const SettingsProfileInfoForm = ({
+  name,
+  email,
+  birthdate,
+  getUserData,
+}: SettingsProfileInfoFormProps) => {
+  const form = useForm<SettingsProfileInfoSchemaType>({
+    resolver: zodResolver(SettingsProfileInfoSchema),
     defaultValues: {
-      email: "",
-      password: "",
-      name: "",
-      birthdate: new Date(),
+      name: name,
+      email: email,
+      birthdate: birthdate,
     },
   });
 
-  useEffect(() => {
-    removeToken();
+  const onSubmit = useCallback((values: SettingsProfileInfoSchemaType) => {
+    const onSuccess = (response: AxiosResponse<UserRead>) => {
+      getUserData();
+      showSuccessToast({ message: "Information updated with success!" });
+    };
+
+    const onError = (error: AxiosError) => {
+      const data = error.response?.data as { message?: string };
+      showErrorToast({ message: data?.message ?? `${error}` });
+    };
+
+    const body: UserPersonalInfoUpdate = {
+      id: Number(getUser()),
+      name: values.name,
+      email: values.email,
+      birthday: new Intl.DateTimeFormat("sv-SE").format(values.birthdate),
+    };
+
+    axios.patch("users/user_info", body).then(onSuccess).catch(onError);
   }, []);
-
-  const onSubmit = useCallback(
-    (values: RegisterSchemaType) => {
-      const onSuccess = (response: AxiosResponse<AuthResponse>) => {
-        const data = response.data;
-        setToken(data.auth.access_token, data.id.toString());
-
-        router.push("/expense");
-      };
-
-      const onError = (error: AxiosError) => {
-        const data = error.response?.data as { message?: string };
-
-        showErrorToast({ message: data?.message ?? `${error}` });
-      };
-
-      const body: UserCreate = {
-        email: values.email,
-        password: values.password,
-        name: values.name,
-        birthday: new Intl.DateTimeFormat("sv-SE").format(values.birthdate),
-        is_restricted: false,
-        is_admin: false,
-      };
-
-      axiosLogin.post("auth/create", body).then(onSuccess).catch(onError);
-    },
-    [router],
-  );
 
   return (
     <Form {...form}>
       <form
-        className="flex flex-col gap-5"
         onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col gap-4"
       >
         <FormField
           control={form.control}
@@ -109,7 +103,7 @@ const RegisterForm = () => {
           name="birthdate"
           render={({ field }) => (
             <FormItem className="flex flex-col w-full">
-              <FormLabel className=" font-bold">Date of Birth</FormLabel>
+              <FormLabel className=" font-bold">Birthdate</FormLabel>
               <Popover>
                 <PopoverTrigger asChild className="bg-slate-background">
                   <FormControl>
@@ -158,27 +152,13 @@ const RegisterForm = () => {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem className="mb-5">
-              <FormLabel className="font-bold ">Password</FormLabel>
-              <FormControl>
-                <Input
-                  type="password"
-                  placeholder="Your password comes here"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <StyledRegisterButton type="submit">Register</StyledRegisterButton>
+        <Button>
+          <Save />
+          Save Changes
+        </Button>
       </form>
     </Form>
   );
 };
 
-export default RegisterForm;
+export default SettingsProfileInfoForm;

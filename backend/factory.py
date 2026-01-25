@@ -1,3 +1,4 @@
+from controller.auth_controller import router as auth_router
 from controller.expense_controller import router as expense_router
 from controller.image_controller import router as image_router
 from controller.label_controller import router as label_controller
@@ -25,12 +26,11 @@ def create_app():
         allow_headers=["*"],
     )
 
-    app.include_router(expense_router, prefix="/api", tags=["Expenses"])
-    app.include_router(image_router, prefix="/api", tags=["Images"])
-    app.include_router(label_controller, prefix="/api", tags=["Labels"])
-    app.include_router(user_router, prefix="/api", tags=["Users"])
-    app.include_router(
-        monthly_snapshots_router, prefix="/api", tags=["Monthly Snapshots"]
-    )
+    app.include_router(expense_router)
+    app.include_router(image_router)
+    app.include_router(label_controller)
+    app.include_router(user_router)
+    app.include_router(monthly_snapshots_router)
+    app.include_router(auth_router)
 
     return app
