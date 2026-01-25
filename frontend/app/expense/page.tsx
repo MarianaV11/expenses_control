@@ -5,12 +5,18 @@ import Expenses from "@/components/Expenses/Expenses";
 import FinancialSummary from "@/components/FinancialSummary/FinancialSummary";
 import { axios } from "@/service/axios_config";
 import { getUser } from "@/service/local_storage";
+import { useSidebarIcon } from "@/store/sidebar_icon.store";
 import { MonthlyStatus } from "@/types/expenses";
 import { AxiosResponse } from "axios";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-const Expense = () => {
+const Page = () => {
   const [monthlyStatus, setMonthlyStatus] = useState<MonthlyStatus>();
+  const setCurrentActive = useSidebarIcon((state) => state.setCurrentActive);
+
+  useEffect(() => {
+    setCurrentActive("Current Month");
+  }, []);
 
   const getMonthlyStatus = useCallback(async () => {
     axios
@@ -41,4 +47,4 @@ const Expense = () => {
   );
 };
 
-export default Expense;
+export default Page;

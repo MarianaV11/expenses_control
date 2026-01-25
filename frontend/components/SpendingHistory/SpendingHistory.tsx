@@ -1,7 +1,6 @@
 "use client";
 
 import { axios } from "@/service/axios_config";
-import { getUser } from "@/service/local_storage";
 import { showErrorToast } from "@/service/toast_service";
 import { Pagination } from "@/types/general";
 import { MonthlySnapshot, MonthlySnapshots } from "@/types/monthly_snapshots";
@@ -62,7 +61,7 @@ const SpendingHistory = () => {
         <span className="font-bold">{monthlySnapshots?.total_snapshots}</span>{" "}
         months recorded.
       </h2>
-      <div className="border p-5 rounded-sm border-t-8">
+      <div className="border p-5 rounded-sm border-t-8 border-primary/50">
         <div className="grid grid-cols-1 lg:grid-cols-3 2xl:grid-cols-4 gap-5">
           {monthlySnapshots?.snapshots &&
             monthlySnapshots?.snapshots.map((snapshot: MonthlySnapshot) => (

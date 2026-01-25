@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { removeToken } from "@/service/local_storage";
+import { useSidebarIcon } from "@/store/sidebar_icon.store";
 import {
   ChevronFirst,
   ChevronLast,
@@ -11,7 +13,6 @@ import {
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useCallback } from "react";
 import SidebarItem from "./SidebarItem";
-import { removeToken } from "@/service/local_storage";
 
 interface SidebarProps {
   setExpanded: Dispatch<SetStateAction<boolean>>;
@@ -20,6 +21,7 @@ interface SidebarProps {
 
 const Sidebar = ({ expanded, setExpanded }: SidebarProps) => {
   const router = useRouter();
+  const activeIcon = useSidebarIcon((state) => state.activeIcon);
 
   const onLogout = useCallback(() => {
     removeToken();
@@ -51,18 +53,21 @@ const Sidebar = ({ expanded, setExpanded }: SidebarProps) => {
         <div className="flex-1 p-4">
           <SidebarItem
             icon={<HandCoins />}
+            active={activeIcon == "Current Month"}
             text="Current Month"
             showItem={expanded}
             onClick={() => router.push("/expense")}
           />
           <SidebarItem
             icon={<History />}
+            active={activeIcon == "Spending History"}
             text="Spending History"
             showItem={expanded}
             onClick={() => router.push("/history")}
           />
           <SidebarItem
             icon={<Cog />}
+            active={activeIcon == "Settings"}
             text="Settings"
             showItem={expanded}
             onClick={() => router.push("/settings")}
