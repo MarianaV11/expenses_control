@@ -410,7 +410,7 @@ const ExpensesForm = ({
                         </div>
                         <Separator />
                         <SelectGroup>
-                          <SelectLabel>Labels </SelectLabel>
+                          <SelectLabel>Labels</SelectLabel>
                           <SelectItem value="none" className="opacity-70">
                             No label
                           </SelectItem>
@@ -421,7 +421,7 @@ const ExpensesForm = ({
                                 <Badge
                                   variant="outline"
                                   style={{ backgroundColor: option.color }}
-                                  className="border dark:hover:opacity-60 scale-105"
+                                  className="border dark:hover:opacity-60 scale-105 text-white"
                                 >
                                   <p>{option.name}</p>
                                 </Badge>

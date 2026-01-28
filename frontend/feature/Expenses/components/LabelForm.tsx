@@ -166,7 +166,7 @@ const LabelForm = ({
                       <Badge
                         variant="outline"
                         style={{ backgroundColor: currentColor }}
-                        className="border max-md:mt-6 max-md:mb-6 dark:hover:opacity-60 animate-bounce scale-105"
+                        className="text-white border max-md:mt-6 max-md:mb-6 dark:hover:opacity-60 animate-bounce scale-105"
                       >
                         <p>{!name ? "No label" : name}</p>
                       </Badge>
