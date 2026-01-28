@@ -18,7 +18,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { axiosLogin } from "@/service/axios_config";
+import { axios } from "@/service/axios_config";
 import { removeToken, setToken } from "@/service/local_storage";
 import { showToast } from "@/service/toast_service";
 import { AuthResponse } from "@/types/auth";
@@ -80,7 +80,7 @@ const RegisterForm = () => {
         is_admin: false,
       };
 
-      axiosLogin.post("auth/create", body).then(onSuccess).catch(onError);
+      axios.post("auth/create", body).then(onSuccess).catch(onError);
     },
     [router],
   );

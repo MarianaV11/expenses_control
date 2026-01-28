@@ -1,8 +1,9 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { removeToken } from "@/service/local_storage";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Background from "./components/Background";
 import LoginContainer from "./components_login/LoginContainer";
 import LoginTagline from "./components_login/LoginTagline";
@@ -16,6 +17,10 @@ const Auth = () => {
     setRegister((prev) => !prev);
   };
 
+  useEffect(() => {
+    removeToken();
+  }, []);
+
   return (
     <div className="relative flex min-h-[100dvh] min-w-[100dvw] items-center justify-center overflow-hidden">
       <Background />
@@ -28,7 +33,7 @@ const Auth = () => {
             exit={{ opacity: 0, x: -200 }}
             transition={{ duration: 0.6, ease: "easeInOut" }}
             className={cn(
-              "absolute flex gap-[2rem] lg:gap-[10rem] justify-center items-center w-full"
+              "absolute flex gap-[2rem] lg:gap-[10rem] justify-center items-center w-full",
             )}
           >
             <LoginTagline onRegisterClick={onClickRegister} />
@@ -43,7 +48,7 @@ const Auth = () => {
             exit={{ opacity: 0, x: -200 }}
             transition={{ duration: 0.6, ease: "easeInOut" }}
             className={cn(
-              "absolute flex gap-[2rem] lg:gap-[10rem] justify-center items-center w-full"
+              "absolute flex gap-[2rem] lg:gap-[10rem] justify-center items-center w-full",
             )}
           >
             <RegisterContainer onRegisterClick={onClickRegister} />
