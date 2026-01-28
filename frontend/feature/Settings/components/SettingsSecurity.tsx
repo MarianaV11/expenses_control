@@ -3,7 +3,7 @@
 import CommonDialog from "@/components/external/CommonDialog";
 import { Lock } from "lucide-react";
 import { useState } from "react";
-import { Button } from "../../ui/button";
+import { Button } from "../../../components/ui/button";
 import SettingsSecurityForm from "./forms/SettingsSecurityForm";
 
 const SettingsSecurity = () => {
@@ -13,7 +13,7 @@ const SettingsSecurity = () => {
     <div className="flex flex-col gap-4 border rounded-md p-8 bg-background w-[55%] max-lg:w-[100%]">
       <h1 className="text-3xl">Security</h1>
       <p className="text-muted-foreground text-sm">
-        Manage your account security settings and keep your information safe.
+        Manage your account security settings and keep your information safe
       </p>
 
       <div className="flex items-center gap-3">
@@ -22,7 +22,7 @@ const SettingsSecurity = () => {
           <h2>Change Password</h2>
           <p className="text-muted-foreground text-sm">
             Update your password regularly to help protect your account from
-            unauthorized access.
+            unauthorized access
           </p>
         </div>
         <Button className="ml-auto" onClick={() => setOpenDialog(true)}>

@@ -1,7 +1,8 @@
 "use client";
 
-import DefaultLayout from "@/components/DefaultLayout/DefaultLayout";
-import Settings from "@/components/Settings/Settings";
+import TitlePage from "@/components/TitlePage";
+import DefaultLayout from "@/layout/DefaultLayout/DefaultLayout";
+import Settings from "@/feature/Settings/Settings";
 import { useSidebarIcon } from "@/store/sidebar_icon.store";
 import { useEffect } from "react";
 
@@ -14,6 +15,7 @@ const Page = () => {
 
   return (
     <DefaultLayout>
+      <TitlePage name="Settings" />
       <Settings />
     </DefaultLayout>
   );

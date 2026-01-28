@@ -77,13 +77,13 @@ const SettingsProfile = () => {
             {user?.name.split(" ").slice(0, 2).join(" ")}
           </h3>
           <div className="flex items-center gap-2">
-            <Mail className="text-muted-foreground h-4 w-4 max-sm:hidden" />
+            <Mail className="text-primary/60 h-4 w-4 max-sm:hidden" />
             <p className="text-xs text-muted-foreground hover:opacity-80">
               {user?.email}
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Calendar className="text-muted-foreground h-4 w-4 max-sm:hidden" />
+            <Calendar className="text-primary/60 h-4 w-4 max-sm:hidden" />
             <p className="text-xs text-muted-foreground hover:opacity-40">
               {user?.birthday.replaceAll("-", "/")}
             </p>

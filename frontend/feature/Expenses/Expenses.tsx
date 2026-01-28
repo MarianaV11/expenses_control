@@ -18,8 +18,8 @@ import { AxiosError, AxiosResponse } from "axios";
 import { format, toZonedTime } from "date-fns-tz";
 import { MoreHorizontal, Plus } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import CommonDialog from "../external/CommonDialog";
-import { Badge } from "../ui/badge";
+import CommonDialog from "../../components/external/CommonDialog";
+import { Badge } from "../../components/ui/badge";
 import ExpensesForm from "./components/ExpensesForm";
 import ExpensesTable, {
   Expense as ExpenseColumnType,

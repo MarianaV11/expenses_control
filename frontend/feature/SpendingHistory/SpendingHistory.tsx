@@ -7,15 +7,15 @@ import { MonthlySnapshot, MonthlySnapshots } from "@/types/monthly_snapshots";
 import { AxiosError, AxiosResponse } from "axios";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
-import CommonDialog from "../external/CommonDialog";
-import { Button } from "../ui/button";
+import CommonDialog from "../../components/external/CommonDialog";
+import { Button } from "../../components/ui/button";
 import SpendingHistoryCard from "./components/SpendingHistoryCard";
 import SpendingHistoryMetrics from "./components/SpendingHistoryMetrics";
 
 const SpendingHistory = () => {
   const [pagination, setPagination] = useState<Pagination>({
     page: 1,
-    per_page: 11,
+    per_page: 9,
   });
   const [monthlySnapshots, setMonthlySnapshots] =
     useState<MonthlySnapshots | null>(null);
@@ -55,14 +55,9 @@ const SpendingHistory = () => {
   };
 
   return (
-    <div className="m-4">
-      <h1 className="text-3xl">Spending History</h1>
-      <h2 className="font-light text-end">
-        <span className="font-bold">{monthlySnapshots?.total_snapshots}</span>{" "}
-        months recorded.
-      </h2>
+    <>
       <div className="border p-5 rounded-sm border-t-8 border-primary/50">
-        <div className="grid grid-cols-1 lg:grid-cols-3 2xl:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           {monthlySnapshots?.snapshots &&
             monthlySnapshots?.snapshots.map((snapshot: MonthlySnapshot) => (
               <SpendingHistoryCard
@@ -78,6 +73,12 @@ const SpendingHistory = () => {
         {!monthlySnapshots?.snapshots.length && (
           <div className="text-center w-full">No history found ✘</div>
         )}
+
+        <h2 className="font-light text-muted-foreground text-end mt-5">
+          <span className="font-bold">{monthlySnapshots?.total_snapshots}</span>{" "}
+          months recorded.
+        </h2>
+
         <div className="mt-5 flex justify-between">
           <Button
             variant="outline"
@@ -120,7 +121,7 @@ const SpendingHistory = () => {
           }
         />
       )}
-    </div>
+    </>
   );
 };
 

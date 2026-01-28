@@ -5,8 +5,8 @@ import { MonthlyStatus } from "@/types/expenses";
 import { formatCurrency } from "@/utils/currency";
 import { DollarSign, Edit, TrendingDown, TrendingUp } from "lucide-react";
 import { useEffect, useState } from "react";
-import CommonDialog from "../external/CommonDialog";
-import { Button } from "../ui/button";
+import CommonDialog from "../../components/external/CommonDialog";
+import { Button } from "../../components/ui/button";
 import FinancialSummaryForm from "./components/FinancialSummaryForm";
 
 interface FinancialSummaryProps {

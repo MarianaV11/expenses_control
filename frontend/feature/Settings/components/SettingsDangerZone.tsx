@@ -12,8 +12,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "../../ui/alert-dialog";
-import { Button } from "../../ui/button";
+} from "../../../components/ui/alert-dialog";
+import { Button } from "../../../components/ui/button";
 
 const SettingsDangerZone = () => {
   const router = useRouter();
@@ -48,7 +48,7 @@ const SettingsDangerZone = () => {
               </AlertDialogTitle>
               <AlertDialogDescription>
                 This action cannot be undone. This will permanently delete your
-                account from our servers.
+                account from our servers
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

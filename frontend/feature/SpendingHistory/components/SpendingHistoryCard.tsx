@@ -26,7 +26,7 @@ const SpendingHistoryCard = ({
       onClick={onClick}
       className="relative hover:scale-105 hover:shadow-2xl cursor-pointer transform transition-transform ease-in-out duration-300"
     >
-      <div className="bg-gradient-to-r from-[var(--primary)]/50 via-purple-600 to-[var(--secondary)]/60 h-3 w-full rounded-t-lg absolute top-0"></div>
+      <div className="bg-gradient-to-r from-[var(--primary)]/50 via-purple-600 to-[var(--secondary)] h-3 w-full rounded-t-lg absolute top-0"></div>
       <CardHeader className="flex justify-between max-sm:flex-col max-sm:items-center">
         <CardTitle>{yearMonth.replace("-", "/")}</CardTitle>
         {totalSpent >= currentRevenue ? (

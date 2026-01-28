@@ -1,8 +1,9 @@
 "use client";
 
-import DefaultLayout from "@/components/DefaultLayout/DefaultLayout";
-import Expenses from "@/components/Expenses/Expenses";
-import FinancialSummary from "@/components/FinancialSummary/FinancialSummary";
+import TitlePage from "@/components/TitlePage";
+import DefaultLayout from "@/layout/DefaultLayout/DefaultLayout";
+import Expenses from "@/feature/Expenses/Expenses";
+import FinancialSummary from "@/feature/FinancialSummary/FinancialSummary";
 import { axios } from "@/service/axios_config";
 import { getUser } from "@/service/local_storage";
 import { useSidebarIcon } from "@/store/sidebar_icon.store";
@@ -35,8 +36,8 @@ const Page = () => {
 
   return (
     <DefaultLayout>
-      <div className="m-4 flex flex-col gap-4">
-        <h1 className="text-3xl">Expense Log</h1>
+      <TitlePage name="Expense Log" />
+      <div className="flex flex-col gap-4">
         <FinancialSummary
           getMonthlyStatus={getMonthlyStatus}
           monthlyStatus={monthlyStatus}
