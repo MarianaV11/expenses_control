@@ -20,7 +20,7 @@ import {
 import { cn } from "@/lib/utils";
 import { axiosLogin } from "@/service/axios_config";
 import { removeToken, setToken } from "@/service/local_storage";
-import { showErrorToast } from "@/service/toast_service";
+import { showToast } from "@/service/toast_service";
 import { AuthResponse } from "@/types/auth";
 import { UserCreate } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -68,7 +68,7 @@ const RegisterForm = () => {
       const onError = (error: AxiosError) => {
         const data = error.response?.data as { message?: string };
 
-        showErrorToast({ message: data?.message ?? `${error}` });
+        showToast({ message: data?.message ?? String(error), type: "error" });
       };
 
       const body: UserCreate = {

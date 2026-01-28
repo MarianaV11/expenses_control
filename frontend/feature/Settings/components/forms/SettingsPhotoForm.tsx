@@ -16,7 +16,7 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { axios } from "@/service/axios_config";
 import { getUser } from "@/service/local_storage";
-import { showErrorToast, showSuccessToast } from "@/service/toast_service";
+import { showToast } from "@/service/toast_service";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AxiosError } from "axios";
 import { ArrowRight, ImageMinus, ImagePlus, ImageUp, User } from "lucide-react";
@@ -123,13 +123,17 @@ export const SettingsPhotoForm = ({
       headers: { "Content-Type": "multipart/form-data" },
     })
       .then(() => {
-        showSuccessToast({ message: "Profile updated with success!" });
+        showToast({
+          message: "Profile updated with success!",
+          type: "success",
+        });
         setOpenForm(false);
         getProfile();
       })
       .catch((error: AxiosError) => {
-        showErrorToast({
+        showToast({
           message: `Error updating profile picture: ${error.message}`,
+          type: "error",
         });
         setOpenForm(false);
       });

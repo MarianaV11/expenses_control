@@ -36,7 +36,7 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { axios } from "@/service/axios_config";
 import { getUser } from "@/service/local_storage";
-import { showErrorToast, showSuccessToast } from "@/service/toast_service";
+import { showToast } from "@/service/toast_service";
 import { Expense, ExpenseCreate, ExpenseUpdate } from "@/types/expenses";
 import { Label, LabelIdentifier } from "@/types/label";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -99,14 +99,14 @@ const ExpensesForm = ({
     const onSuccess = (response: AxiosResponse<Expense>) => {
       getExpenses();
 
-      showSuccessToast({ message: "Expense created with success!" });
+      showToast({ message: "Expense created with success!", type: "success" });
       closeDialog();
     };
 
     const onError = (error: AxiosError) => {
       const data = error.response?.data as { message?: string };
 
-      showErrorToast({ message: data?.message ?? `${error}` });
+      showToast({ message: data?.message ?? String(error), type: "error" });
       closeDialog();
     };
 
@@ -127,14 +127,14 @@ const ExpensesForm = ({
     const onSuccess = (response: AxiosResponse<Expense>) => {
       getExpenses();
 
-      showSuccessToast({ message: "Expense updated with success!" });
+      showToast({ message: "Expense updated with success!", type: "success" });
       closeDialog();
     };
 
     const onError = (error: AxiosError) => {
       const data = error.response?.data as { message?: string };
 
-      showErrorToast({ message: data?.message ?? `${error}` });
+      showToast({ message: data?.message ?? String(error), type: "error" });
       closeDialog();
     };
 
@@ -164,7 +164,7 @@ const ExpensesForm = ({
 
       setOptions(response.data.labels);
     } catch (error) {
-      showErrorToast({ message: `${error}` });
+      showToast({ message: String(error), type: "error" });
     }
   };
 
@@ -182,11 +182,13 @@ const ExpensesForm = ({
         data: body,
       })
       .then((response: AxiosResponse) => {
-        showSuccessToast({ message: response.data.message });
+        showToast({ message: response.data.message, type: "success" });
 
         getLabels();
       })
-      .catch((error: AxiosError) => showErrorToast({ message: error.message }));
+      .catch((error: AxiosError) =>
+        showToast({ message: error.message, type: "error" }),
+      );
   };
 
   useEffect(() => {

@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/form";
 import { axios } from "@/service/axios_config";
 import { getUser } from "@/service/local_storage";
-import { showErrorToast, showSuccessToast } from "@/service/toast_service";
+import { showToast } from "@/service/toast_service";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AxiosError, AxiosResponse } from "axios";
 import { useCallback } from "react";
@@ -44,7 +44,7 @@ const FinancialSummaryForm = ({
   const onSubmit = useCallback((values: FinancialSchemaType) => {
     const onSuccess = (response: AxiosResponse) => {
       const data = response.data;
-      showSuccessToast({ message: data?.message });
+      showToast({ message: data?.message, type: "success" });
 
       getMonthlyStatus();
 
@@ -52,14 +52,14 @@ const FinancialSummaryForm = ({
     };
 
     const onError = (error: AxiosError) => {
-      showErrorToast({ message: error.message });
+      showToast({ message: error.message, type: "error" });
     };
 
     const user_id = getUser();
 
     axios
       .patch(
-        `users/monthly_revenue?user_id=${user_id}&new_monthly_revenue=${values.monthly_revenue}`
+        `users/monthly_revenue?user_id=${user_id}&new_monthly_revenue=${values.monthly_revenue}`,
       )
       .then(onSuccess)
       .catch(onError);

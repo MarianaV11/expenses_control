@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { axios } from "@/service/axios_config";
 import { getUser } from "@/service/local_storage";
-import { showErrorToast, showSuccessToast } from "@/service/toast_service";
+import { showToast } from "@/service/toast_service";
 import { Label, LabelCreate, LabelUpdate } from "@/types/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AxiosError, AxiosResponse } from "axios";
@@ -66,14 +66,14 @@ const LabelForm = ({
     const onSuccess = (response: AxiosResponse<Label>) => {
       getLabels();
 
-      showSuccessToast({ message: "Label created with success!" });
+      showToast({ message: "Label created with success!", type: "success" });
       closeDialog();
     };
 
     const onError = (error: AxiosError) => {
       const data = error.response?.data as { message?: string };
 
-      showErrorToast({ message: data?.message ?? `${error}` });
+      showToast({ message: data?.message ?? String(error), type: "error" });
       closeDialog();
     };
 
@@ -90,14 +90,14 @@ const LabelForm = ({
     const onSuccess = (response: AxiosResponse<Label>) => {
       getLabels();
 
-      showSuccessToast({ message: "Label updated with success!" });
+      showToast({ message: "Label updated with success!", type: "success" });
       closeDialog();
     };
 
     const onError = (error: AxiosError) => {
       const data = error.response?.data as { message?: string };
 
-      showErrorToast({ message: data?.message ?? `${error}` });
+      showToast({ message: data?.message ?? String(error), type: "error" });
       closeDialog();
     };
 

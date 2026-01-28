@@ -19,7 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 import { axios } from "@/service/axios_config";
 import { getUser } from "@/service/local_storage";
-import { showErrorToast, showSuccessToast } from "@/service/toast_service";
+import { showToast } from "@/service/toast_service";
 import { UserPersonalInfoUpdate, UserRead } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AxiosError, AxiosResponse } from "axios";
@@ -61,12 +61,18 @@ const SettingsProfileInfoForm = ({
   const onSubmit = useCallback((values: SettingsProfileInfoSchemaType) => {
     const onSuccess = (response: AxiosResponse<UserRead>) => {
       getUserData();
-      showSuccessToast({ message: "Information updated with success!" });
+      showToast({
+        message: "Information updated with success!",
+        type: "success",
+      });
     };
 
     const onError = (error: AxiosError) => {
       const data = error.response?.data as { message?: string };
-      showErrorToast({ message: data?.message ?? `${error}` });
+      showToast({
+        message: data?.message ?? String(error),
+        type: "error",
+      });
     };
 
     const body: UserPersonalInfoUpdate = {

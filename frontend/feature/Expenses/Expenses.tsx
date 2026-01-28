@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { axios } from "@/service/axios_config";
 import { getUser } from "@/service/local_storage";
-import { showErrorToast, showSuccessToast } from "@/service/toast_service";
+import { showErrorToast, showToast } from "@/service/toast_service";
 import { Expense, Expenses as ExpensesType } from "@/types/expenses";
 import { Pagination } from "@/types/general";
 import { ColumnDef } from "@tanstack/react-table";
@@ -72,7 +72,9 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
           getMonthlyStatus();
         }
       })
-      .catch((error: AxiosError) => showErrorToast({ message: error.message }));
+      .catch((error: AxiosError) =>
+        showToast({ message: error.message, type: "error" }),
+      );
   };
 
   useEffect(() => {
@@ -87,12 +89,14 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
       .then((response: AxiosResponse) => {
         setData((prev) => prev.filter((item) => item.id !== id));
 
-        showSuccessToast({ message: response.data.message });
+        showToast({ message: response.data.message, type: "error" });
 
         getExpenses();
         getMonthlyStatus();
       })
-      .catch((error: AxiosError) => showErrorToast({ message: error.message }));
+      .catch((error: AxiosError) =>
+        showToast({ message: error.message, type: "error" }),
+      );
   };
 
   const columns = useMemo<ColumnDef<ExpenseColumnType>[]>(
@@ -226,7 +230,9 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
         setSelectedData(data);
         setOpenDialog(true);
       })
-      .catch((error: AxiosError) => showErrorToast({ message: `${error}` }));
+      .catch((error: AxiosError) =>
+        showToast({ message: String(error), type: "error" }),
+      );
   };
 
   const closeDialog = () => {

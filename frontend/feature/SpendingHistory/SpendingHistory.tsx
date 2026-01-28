@@ -1,7 +1,7 @@
 "use client";
 
 import { axios } from "@/service/axios_config";
-import { showErrorToast } from "@/service/toast_service";
+import { showToast } from "@/service/toast_service";
 import { Pagination } from "@/types/general";
 import { MonthlySnapshot, MonthlySnapshots } from "@/types/monthly_snapshots";
 import { AxiosError, AxiosResponse } from "axios";
@@ -41,7 +41,9 @@ const SpendingHistory = () => {
 
         setMonthlySnapshots(data);
       })
-      .catch((error: AxiosError) => showErrorToast({ message: `${error}` }));
+      .catch((error: AxiosError) =>
+        showToast({ message: String(error), type: "error" }),
+      );
   };
 
   const setCurrentMonthlySnapshot = (snapshotId: number) => {

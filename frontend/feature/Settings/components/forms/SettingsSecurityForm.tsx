@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { axios } from "@/service/axios_config";
 import { getUser } from "@/service/local_storage";
-import { showErrorToast, showSuccessToast } from "@/service/toast_service";
+import { showToast } from "@/service/toast_service";
 import { UserPasswordUpdate, UserRead } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AxiosError, AxiosResponse } from "axios";
@@ -47,12 +47,12 @@ const SettingsSecurityForm = ({ setOpenForm }: SettingsSecurityFormProps) => {
   const onSubmit = useCallback((values: SettingsSecuritySchemaType) => {
     const onSuccess = (response: AxiosResponse<UserRead>) => {
       setOpenForm(false);
-      showSuccessToast({ message: "Password updated successfully!" });
+      showToast({ message: "Password updated successfully!", type: "success" });
     };
 
     const onError = (error: AxiosError) => {
       const data = error.response?.data as { message?: string };
-      showErrorToast({ message: data?.message ?? `${error}` });
+      showToast({ message: data?.message ?? String(error), type: "error" });
     };
 
     const body: UserPasswordUpdate = {
