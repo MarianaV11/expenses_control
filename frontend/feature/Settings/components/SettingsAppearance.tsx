@@ -1,9 +1,14 @@
+"use client";
+
 import { Switch } from "@/components/ui/switch";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 const SettingsAppearance = () => {
   const { theme, setTheme } = useTheme();
+
+  const [mounted, setMounted] = useState<boolean>(false);
 
   const onSwitch = () => {
     if (theme === "light") {
@@ -12,6 +17,12 @@ const SettingsAppearance = () => {
       setTheme("light");
     }
   };
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
 
   return (
     <div className="flex flex-col gap-4 border rounded-md p-8 bg-background w-[55%] max-lg:w-[100%]">
