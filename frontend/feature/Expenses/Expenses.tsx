@@ -8,9 +8,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 import { axios } from "@/service/axios_config";
 import { getUser } from "@/service/local_storage";
-import { showErrorToast, showToast } from "@/service/toast_service";
+import { showToast } from "@/service/toast_service";
 import { Expense, Expenses as ExpensesType } from "@/types/expenses";
 import { Pagination } from "@/types/general";
 import { ColumnDef } from "@tanstack/react-table";
@@ -182,7 +183,10 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
               <Badge
                 variant="outline"
                 style={{ backgroundColor: row.original.label_color }}
-                className="border dark:hover:opacity-60"
+                className={cn(
+                  "border dark:hover:opacity-60 text-white",
+                  row.getValue("label_name") ?? "text-dark",
+                )}
               >
                 {row.getValue("label_name") ?? "No label"}
               </Badge>
