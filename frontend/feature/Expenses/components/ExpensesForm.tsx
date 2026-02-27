@@ -37,6 +37,7 @@ import { cn } from "@/lib/utils";
 import { axios } from "@/service/axios_config";
 import { getUser } from "@/service/local_storage";
 import { showToast } from "@/service/toast_service";
+import { useBank } from "@/store/banks.store";
 import { Expense, ExpenseCreate, ExpenseUpdate } from "@/types/expenses";
 import { Label, LabelIdentifier } from "@/types/label";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -86,6 +87,9 @@ const ExpensesForm = ({
   const [options, setOptions] = useState<Label[]>([]);
   const [openLabelDialog, setOpenLabelDialog] = useState<boolean>(false);
   const [labelData, setLabelData] = useState<Label | null>(null);
+
+  const banks = useBank((state) => state.banks);
+  const typePayment = useBank((state) => state.typePayment);
 
   const onSubmit = (values: ExpensesSchemaType) => {
     if (!currentExpense) {
@@ -321,18 +325,11 @@ const ExpensesForm = ({
                       <SelectContent>
                         <SelectGroup>
                           <SelectLabel>Bank</SelectLabel>
-                          <SelectItem value="Other" className="opacity-70">
-                            Other
-                          </SelectItem>
-                          <SelectItem value="Itaú">Itaú</SelectItem>
-                          <SelectItem value="Banco do Brasil">
-                            Banco do Brasil
-                          </SelectItem>
-                          <SelectItem value="Bradesco">Bradesco</SelectItem>
-                          <SelectItem value="Santander">Santander</SelectItem>
-                          <SelectItem value="Nubank">Nubank</SelectItem>
-                          <SelectItem value="Inter">Inter</SelectItem>
-                          <SelectItem value="C6 Bank">C6 Bank</SelectItem>
+                          {banks.map((bank) => (
+                            <SelectItem value={bank} key={bank}>
+                              {bank}
+                            </SelectItem>
+                          ))}
                         </SelectGroup>
                       </SelectContent>
                     </Select>
@@ -360,9 +357,11 @@ const ExpensesForm = ({
                       <SelectContent>
                         <SelectGroup>
                           <SelectLabel>Type</SelectLabel>
-                          <SelectItem value="PIX">PIX</SelectItem>
-                          <SelectItem value="Credit">Credit</SelectItem>
-                          <SelectItem value="In cash">In cash</SelectItem>
+                          {typePayment.map((type) => (
+                            <SelectItem value={type} key={type}>
+                              {type}
+                            </SelectItem>
+                          ))}
                         </SelectGroup>
                       </SelectContent>
                     </Select>

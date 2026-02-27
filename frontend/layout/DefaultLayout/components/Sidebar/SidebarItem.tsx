@@ -20,7 +20,7 @@ const SidebarItem = ({
     <div
       onClick={onClick}
       className={cn(
-        "relative flex items-center py-2 px-2 font-medium rounded-md cursor-pointer transition-colors",
+        "relative flex items-center py-2 px-2 font-medium rounded-md cursor-pointer transition-colors mt-1 mb-1",
         active
           ? "bg-indigo-200 dark:bg-gray-800"
           : "hover:bg-indigo-50 hover:scale-105 transform transition-transform ease-in-out duration-300 text-gray-600 dark:hover:bg-card dark:text-slate-300",

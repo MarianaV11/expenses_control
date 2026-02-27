@@ -1,8 +1,9 @@
 from datetime import date, datetime
 from decimal import Decimal
+from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
 
 class ExpenseBase(BaseModel):
@@ -56,3 +57,36 @@ class ExpensesStatus(BaseModel):
     total_expenses: Decimal
 
     model_config = {"from_attributes": True}
+
+
+class SortOrder(str, Enum):
+    asc = "asc"
+    desc = "desc"
+
+
+class ExpenseSortField(str, Enum):
+    name = "name"
+    value = "value"
+    day = "day"
+    card = "card"
+    payment_type = "payment_type"
+    card_name = "card_name"
+    created_at = "created_at"
+    label = "label"
+
+
+class ExpenseFilter(BaseModel):
+    sort_by: ExpenseSortField = ExpenseSortField.day
+    order: SortOrder
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    label_id: Optional[int] = None
+    card_name: Optional[str] = None
+    payment_type: Optional[str] = None
+
+    @model_validator(mode="after")
+    def validate_dates(self):
+        if self.start_date and self.end_date:
+            if self.start_date > self.end_date:
+                raise ValueError("start_date cannot be greater than end_date")
+        return self

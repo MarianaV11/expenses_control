@@ -96,6 +96,7 @@ const ExpensesTable = <TData, TValue>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
+                className="hover:text-primary transition-colors duration-300 ease-in-out"
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>

@@ -12,20 +12,40 @@ import { cn } from "@/lib/utils";
 import { axios } from "@/service/axios_config";
 import { getUser } from "@/service/local_storage";
 import { showToast } from "@/service/toast_service";
-import { Expense, Expenses as ExpensesType } from "@/types/expenses";
+import { useBank } from "@/store/banks.store";
+import { useLabel } from "@/store/label.store";
+import {
+  Expense,
+  ExpenseFilter,
+  Expenses as ExpensesType,
+} from "@/types/expenses";
 import { Pagination } from "@/types/general";
 import { ColumnDef } from "@tanstack/react-table";
 import { AxiosError, AxiosResponse } from "axios";
 import { format, toZonedTime } from "date-fns-tz";
-import { MoreHorizontal, Plus } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import {
+  ArrowDown,
+  ArrowUp,
+  Banknote,
+  CreditCard,
+  MoreHorizontal,
+  Plus,
+} from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import CommonDialog from "../../components/external/CommonDialog";
 import { Badge } from "../../components/ui/badge";
 import ExpensesForm from "./components/ExpensesForm";
+import ExpensesHeaderDropdown from "./components/ExpensesHeaderDropdown";
+import ExpensesRangeDate from "./components/ExpensesRangeDate";
 import ExpensesTable, {
   Expense as ExpenseColumnType,
 } from "./components/ExpensesTable";
 
+const now = new Date();
+
+const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 interface ExpensesProps {
   getMonthlyStatus: () => Promise<void>;
 }
@@ -41,46 +61,89 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
   const [selectedData, setSelectedData] = useState<Expense | null>(null);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
-  const getExpenses = async () => {
-    axios
-      .get("/expenses/user_expenses", {
+  const [filter, setFilter] = useState<ExpenseFilter>({
+    sort_by: "day",
+    order: "desc",
+    start_date: firstDayOfMonth,
+    end_date: lastDayOfMonth,
+    label_id: null,
+    card_name: null,
+    payment_type: null,
+  });
+
+  const banks = useBank((state) => state.banks);
+  const typePayment = useBank((state) => state.typePayment);
+
+  const labels = useLabel((state) => state.labels);
+  const setLabels = useLabel((state) => state.setLabel);
+
+  const getExpenses = useCallback(async () => {
+    try {
+      const response: AxiosResponse<ExpensesType> = await axios.get(
+        "/expenses/user_expenses",
+        {
+          params: {
+            user_id: getUser(),
+            page: pagination.page,
+            per_page: pagination.per_page,
+            sort_by: filter.sort_by,
+            order: filter.order,
+            start_date: format(filter.start_date, "yyyy-MM-dd"),
+            end_date: format(filter.end_date, "yyyy-MM-dd"),
+            label_id: filter.label_id,
+            card_name: filter.card_name,
+            payment_type: filter.payment_type,
+          },
+        },
+      );
+
+      const data = response.data;
+
+      setData(
+        data.expenses.map(
+          (expense): ExpenseColumnType => ({
+            name: expense.name,
+            value: expense.value,
+            day: expense.day,
+            card: expense.card,
+            payment_type: expense.payment_type,
+            id: expense.id,
+            label_name: expense.label_name,
+            label_color: expense.label_color,
+          }),
+        ),
+      );
+
+      setObjectData(data);
+      getMonthlyStatus();
+    } catch (error) {
+      showToast({ message: String(error), type: "error" });
+    }
+  }, [pagination, filter, getMonthlyStatus]);
+
+  const getLabels = useCallback(async () => {
+    try {
+      const response: AxiosResponse = await axios.get("/labels/user_labels", {
         params: {
           user_id: getUser(),
-          page: pagination.page,
-          per_page: pagination.per_page,
+          page: 1,
+          per_page: 50,
         },
-      })
-      .then((response: AxiosResponse<ExpensesType>) => {
-        const data = response.data;
+      });
 
-        if (data) {
-          setData(
-            data.expenses.map(
-              (expense): ExpenseColumnType => ({
-                name: expense.name,
-                value: expense.value,
-                day: expense.day,
-                card: expense.card,
-                payment_type: expense.payment_type,
-                id: expense.id,
-                label_name: expense.label_name,
-                label_color: expense.label_color,
-              }),
-            ),
-          );
-
-          setObjectData(data);
-          getMonthlyStatus();
-        }
-      })
-      .catch((error: AxiosError) =>
-        showToast({ message: error.message, type: "error" }),
-      );
-  };
+      setLabels(response.data.labels);
+    } catch (error) {
+      showToast({ message: String(error), type: "error" });
+    }
+  }, []);
 
   useEffect(() => {
     getExpenses();
-  }, [pagination]);
+  }, [pagination, filter]);
+
+  useEffect(() => {
+    getLabels();
+  }, [getLabels]);
 
   const deleteExpense = (id: number) => {
     axios
@@ -90,7 +153,7 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
       .then((response: AxiosResponse) => {
         setData((prev) => prev.filter((item) => item.id !== id));
 
-        showToast({ message: response.data.message, type: "error" });
+        showToast({ message: response.data.message, type: "success" });
 
         getExpenses();
         getMonthlyStatus();
@@ -100,14 +163,54 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
       );
   };
 
+  const changeFilters = useCallback(
+    (
+      sort_by: ExpenseFilter["sort_by"],
+      order: ExpenseFilter["order"],
+      label_id: number | null = null,
+      card_name: string | null = null,
+      payment_type: string | null = null,
+    ) => {
+      setFilter((current) => ({
+        ...current,
+        sort_by,
+        order,
+        label_id,
+        payment_type,
+        card_name,
+      }));
+    },
+    [],
+  );
+
   const columns = useMemo<ColumnDef<ExpenseColumnType>[]>(
     () => [
       {
         accessorKey: "name",
         header: () => (
-          <div className="text-center font-extrabold dark:text-slate-300">
-            Name
-          </div>
+          <ExpensesHeaderDropdown
+            title="Name"
+            actions={[
+              {
+                label: (
+                  <div className="flex items-center gap-2 justify-center">
+                    <ArrowUp />
+                    Sort from A-Z
+                  </div>
+                ),
+                onClick: () => changeFilters("name", "asc"),
+              },
+              {
+                label: (
+                  <div className="flex items-center gap-2 justify-center">
+                    <ArrowDown />
+                    Sort from Z-A
+                  </div>
+                ),
+                onClick: () => changeFilters("name", "desc"),
+              },
+            ]}
+          />
         ),
         cell: ({ row }) => (
           <div className="text-center font-medium">{row.getValue("name")}</div>
@@ -116,9 +219,29 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
       {
         accessorKey: "value",
         header: () => (
-          <div className="text-center font-extrabold dark:text-slate-300">
-            Value
-          </div>
+          <ExpensesHeaderDropdown
+            title="Value"
+            actions={[
+              {
+                label: (
+                  <div className="flex items-center gap-2 justify-center">
+                    <ArrowUp />
+                    Crescent
+                  </div>
+                ),
+                onClick: () => changeFilters("value", "asc"),
+              },
+              {
+                label: (
+                  <div className="flex items-center gap-2 justify-center">
+                    <ArrowDown />
+                    Descending
+                  </div>
+                ),
+                onClick: () => changeFilters("value", "desc"),
+              },
+            ]}
+          />
         ),
         cell: ({ row }) => {
           const amount = parseFloat(row.getValue("value"));
@@ -133,9 +256,29 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
       {
         accessorKey: "day",
         header: () => (
-          <div className="text-center font-extrabold dark:text-slate-300">
-            Day
-          </div>
+          <ExpensesHeaderDropdown
+            title="Day"
+            actions={[
+              {
+                label: (
+                  <div className="flex items-center gap-2 justify-center">
+                    <ArrowUp />
+                    Oldest
+                  </div>
+                ),
+                onClick: () => changeFilters("day", "asc"),
+              },
+              {
+                label: (
+                  <div className="flex items-center gap-2 justify-center">
+                    <ArrowDown />
+                    Latest
+                  </div>
+                ),
+                onClick: () => changeFilters("day", "desc"),
+              },
+            ]}
+          />
         ),
         cell: ({ row }) => {
           const zonedDate = toZonedTime(
@@ -149,9 +292,18 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
       {
         accessorKey: "card",
         header: () => (
-          <div className="text-center font-extrabold dark:text-slate-300">
-            Card
-          </div>
+          <ExpensesHeaderDropdown
+            title="Card"
+            actions={banks.map((bank: string) => ({
+              label: (
+                <div className="flex items-center gap-2">
+                  <CreditCard size={16} />
+                  <span>{bank}</span>
+                </div>
+              ),
+              onClick: () => changeFilters("card", "asc", null, bank),
+            }))}
+          />
         ),
         cell: ({ row }) => (
           <div className="text-center font-medium">{row.getValue("card")}</div>
@@ -160,9 +312,19 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
       {
         accessorKey: "payment_type",
         header: () => (
-          <div className="text-center font-extrabold dark:text-slate-300">
-            Payment Type
-          </div>
+          <ExpensesHeaderDropdown
+            title="Payment Type"
+            actions={typePayment.map((type: string) => ({
+              label: (
+                <div className="flex items-center gap-2">
+                  <Banknote size={16} />
+                  <span>{type}</span>
+                </div>
+              ),
+              onClick: () =>
+                changeFilters("payment_type", "asc", null, null, type),
+            }))}
+          />
         ),
         cell: ({ row }) => (
           <div className="text-center font-medium">
@@ -173,9 +335,22 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
       {
         accessorKey: "label_name",
         header: () => (
-          <div className="text-center font-extrabold dark:text-slate-300">
-            Label
-          </div>
+          <ExpensesHeaderDropdown
+            title="Label"
+            actions={labels.map((type) => ({
+              label: (
+                <div key={type.id} className="flex items-center gap-2">
+                  <Badge
+                    className="text-white"
+                    style={{ backgroundColor: type.color }}
+                  >
+                    {type.name}
+                  </Badge>
+                </div>
+              ),
+              onClick: () => changeFilters("label", "asc", type.id),
+            }))}
+          />
         ),
         cell: ({ row }) => {
           return (
@@ -222,7 +397,7 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
         ),
       },
     ],
-    [deleteExpense],
+    [deleteExpense, changeFilters, banks, typePayment, labels],
   );
 
   const updateExpense = async (expense_id: number) => {
@@ -247,7 +422,14 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
     <>
       <div className="rounded-md border p-2 shadow-sm border-t-10 border-primary/50">
         <div className="flex justify-between p-2">
-          <h1 className="text-center font-bold text-2xl mb-2">Expenses</h1>
+          <h1 className="text-center font-medium text-2xl mb-2">Expenses</h1>
+          <ExpensesRangeDate
+            filter={{
+              start_date: filter.start_date,
+              end_date: filter.end_date,
+            }}
+            setFilter={setFilter}
+          />
           <Button
             size="icon"
             onClick={() => {

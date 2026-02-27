@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, Query
 from fastapi.responses import JSONResponse
 from schemas.expense_schema import (
     ExpenseCreate,
+    ExpenseFilter,
     ExpenseRead,
     ExpensesList,
     ExpensesStatus,
@@ -36,13 +37,27 @@ def create_expense_route(expense: ExpenseCreate):
 
 @router.get("/user_expenses", response_model=ExpensesList)
 def get_expenses_route(
-    user_id: int, page: int = Query(1, ge=1), per_page: int = Query(10, ge=1, le=100)
+    user_id: int,
+    page: int = Query(1, ge=1),
+    per_page: int = Query(10, ge=1, le=100),
+    filters: ExpenseFilter = Depends(),
 ):
     """
     Get all the expenses of a specific user.
     """
 
-    return get_expenses(user_id=user_id, page=page, per_page=per_page)
+    return get_expenses(
+        user_id=user_id,
+        page=page,
+        per_page=per_page,
+        label_id=filters.label_id,
+        sort_by=filters.sort_by,
+        order=filters.order,
+        start_date=filters.start_date,
+        end_date=filters.end_date,
+        card_name=filters.card_name,
+        payment_type=filters.payment_type,
+    )
 
 
 @router.get("/user_expense", response_model=ExpenseRead)
