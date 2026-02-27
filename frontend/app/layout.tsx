@@ -1,6 +1,6 @@
 import { ThemeProvider } from "@/components/ui/theme_provider";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Lora } from "next/font/google";
+import { Geist, Geist_Mono, Poppins } from "next/font/google";
 import { ToastContainer } from "react-toastify";
 import "./globals.css";
 
@@ -14,9 +14,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const geistLora = Lora({
-  variable: "--font-geist-lora",
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -33,7 +34,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${geistLora.variable}`}
+      className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable}`}
     >
       <body className="bg-background" suppressHydrationWarning>
         <ToastContainer />
