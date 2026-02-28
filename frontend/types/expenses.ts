@@ -38,3 +38,20 @@ export type ExpenseCreate = {
 };
 
 export type ExpenseUpdate = ExpenseCreate & ExpenseIdentifier;
+
+export type ExpenseFilter = {
+  sort_by:
+    | "name"
+    | "value"
+    | "day"
+    | "card"
+    | "payment_type"
+    | "created_at"
+    | "label";
+  order: "asc" | "desc";
+  start_date: Date;
+  end_date: Date;
+  label_id: number | null;
+  card_name: string | null;
+  payment_type: string | null;
+};
