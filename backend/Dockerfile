@@ -14,11 +14,13 @@ RUN apk add --no-cache \
     postgresql-dev \
     libffi-dev \
     openssl-dev \
-    curl
+    curl \
+    postgresql-client
 
 # Install UV (as ROOT)
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-ENV PATH="/root/.local/bin:$PATH"
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
+    && cp /root/.local/bin/uv /usr/local/bin/uv \
+    && chmod +x /usr/local/bin/uv
 
 # Copy the rest of the application source code
 COPY . .
@@ -31,4 +33,4 @@ USER dev
 
 EXPOSE 8000
 
-CMD ["uv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "until pg_isready -h db -p 5432; do sleep 2; done && uv run alembic upgrade head && uv run uvicorn main:app --host 0.0.0.0 --port 8000"]
