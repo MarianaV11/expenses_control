@@ -84,29 +84,6 @@ In addition to the directories, the project includes files responsible for appli
 - **Dockerfile**: defines the container environment used to run the application.
 - **pyproject.toml / uv.lock:** manage the project dependencies.
 
-├── Dockerfile
-├── README.md
-├── alembic
-│ ├── ...
-├── alembic.ini
-├── config.py
-├── controller
-│ ├── ...
-├── database.py
-├── factory.py
-├── integration.py
-├── main.py
-├── models
-│ ├── ...
-├── pyproject.toml
-├── schemas
-│ ├── ...
-├── services
-│ ├── ...
-├── utils
-│ ├── ...
-└── uv.lock
-
 ---
 
 ### Frontend
@@ -170,35 +147,6 @@ In addition to these directories, several configuration and infrastructure files
 - **eslint.config.mjs**: defines linting rules to maintain code quality.
 - **components.json**: configuration file related to component management or UI libraries.
 - **next-env.d.ts**: TypeScript environment definitions used by Next.js.
-
-├── Dockerfile
-├── app
-│ ├── ...
-├── components
-│ ├── ...
-├── components.json
-├── eslint.config.mjs
-├── feature
-│ ├── ...
-├── layout
-│ └── DefaultLayout
-├── lib
-│ └── utils.ts
-├── next-env.d.ts
-├── next.config.ts
-├── package-lock.json
-├── package.json
-├── postcss.config.mjs
-├── public
-│ ├── ...
-├── service
-│ ├── ...
-├── store
-│ ├── ...
-├── tsconfig.json
-├── types
-│ ├── ...
-└── utils
 
 ---
 
