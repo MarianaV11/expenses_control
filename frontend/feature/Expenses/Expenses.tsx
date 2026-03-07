@@ -421,7 +421,7 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
   return (
     <>
       <div className="rounded-md border p-2 shadow-sm border-t-10 border-primary/50">
-        <div className="flex justify-between p-2">
+        <div className="flex justify-between p-2 max-md:flex-col max-md:space-y-4 max-md:items-center relative">
           <h1 className="text-center font-medium text-2xl mb-2">Expenses</h1>
           <ExpensesRangeDate
             filter={{
@@ -431,6 +431,7 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
             setFilter={setFilter}
           />
           <Button
+            className="max-md:absolute top-0 right-0"
             size="icon"
             onClick={() => {
               setSelectedData(null);

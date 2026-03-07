@@ -30,7 +30,7 @@ const ExpensesRangeDate = ({ filter, setFilter }: ExpensesRangeDateProps) => {
   };
 
   return (
-    <div className="flex gap-4 items-center">
+    <div className="flex gap-4 items-center max-md:flex-col">
       <Popover>
         <PopoverTrigger asChild className="bg-slate-background">
           <Button variant="outline">
@@ -50,7 +50,7 @@ const ExpensesRangeDate = ({ filter, setFilter }: ExpensesRangeDateProps) => {
         </PopoverContent>
       </Popover>
 
-      <ArrowRight className="h-5 w-5 opacity-50 text-secondary" />
+      <ArrowRight className="h-5 w-5 opacity-50 text-secondary max-md:rotate-90" />
 
       <Popover>
         <PopoverTrigger asChild className="bg-slate-background">
