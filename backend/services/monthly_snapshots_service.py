@@ -73,23 +73,34 @@ def calculate_month_metrics(
     }
 
 
-def create_monthly_snapshot(start: date, end: date):
+def create_monthly_snapshot(start: date, end: date) -> None:
     db = SessionLocal()
+    year_month = f"{start.year}-{start.month:02d}"
 
     try:
         users = db.query(User).all()
 
         for user in users:
+            already_exists = (
+                db.query(MonthlySnapshot)
+                .filter(
+                    MonthlySnapshot.user_id == user.id,
+                    MonthlySnapshot.year_month == year_month,
+                )
+                .first()
+            )
+            if already_exists:
+                continue
+
             metrics = calculate_month_metrics(db, user.id, start, end)
 
             if not metrics:
-                return None
+                continue
 
-            user = db.query(User).filter(User.id == user.id).first()
             snapshot = MonthlySnapshot(
                 user_id=user.id,
                 current_revenue=user.monthly_revenue,
-                year_month=f"{start.year}-{start.month}",
+                year_month=year_month,
                 total_spent=metrics["total_spent"],
                 total_by_label=metrics["total_by_label"],
                 percentage_by_label=metrics["percentage_by_label"],
@@ -102,13 +113,9 @@ def create_monthly_snapshot(start: date, end: date):
             db.commit()
             db.refresh(snapshot)
 
-    except Exception as e:
+    except Exception:
         db.rollback()
-
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"An error occured when trying to create a monthly snapshot: {e}",
-        )
+        raise
     finally:
         db.close()
 
@@ -154,7 +161,6 @@ def get_monthly_snapshots(
                 MonthlySnapshotRead.model_validate(snapshot) for snapshot in snapshots
             ],
         )
-
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

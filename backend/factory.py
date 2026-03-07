@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from controller.auth_controller import router as auth_router
 from controller.expense_controller import router as expense_router
 from controller.image_controller import router as image_router
@@ -6,14 +8,26 @@ from controller.monthly_snapshots_controller import router as monthly_snapshots_
 from controller.user_controller import router as user_router
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from scheduler import start_scheduler, stop_scheduler
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    start_scheduler()
+    yield
+    stop_scheduler()
 
 
 def create_app():
     app = FastAPI(
-        title="Finance Control",
+        title="Expenses Control",
         version="0.1.0",
         docs_url="/api/docs",
-        description="This is the backend of my personal finance control application. The project was developed for my portfolio, is freely available, and is licensed under the MIT license.",
+        description="""
+            This is the backend of my personal Expenses Control application. 
+            The project was developed for my portfolio, is freely available, and is licensed under the MIT license.
+        """,
+        lifespan=lifespan,
     )
 
     origins = ["*"]

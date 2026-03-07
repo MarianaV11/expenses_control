@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "alembic>=1.15.2",
+    "apscheduler>=3.11.2",
     "fastapi>=0.115.12",
     "passlib[bcrypt]>=1.7.4",
     "pip>=25.1.1",
