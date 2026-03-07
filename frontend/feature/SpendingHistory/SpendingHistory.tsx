@@ -11,6 +11,7 @@ import CommonDialog from "../../components/external/CommonDialog";
 import { Button } from "../../components/ui/button";
 import SpendingHistoryCard from "./components/SpendingHistoryCard";
 import SpendingHistoryMetrics from "./components/SpendingHistoryMetrics";
+import { getUser } from "@/service/local_storage";
 
 const SpendingHistory = () => {
   const [pagination, setPagination] = useState<Pagination>({
@@ -31,7 +32,7 @@ const SpendingHistory = () => {
     axios
       .get("/monthly_snapshots/snapshots", {
         params: {
-          user_id: 8,
+          user_id: getUser(),
           page: pagination.page,
           per_page: pagination.per_page,
         },
