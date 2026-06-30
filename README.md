@@ -95,8 +95,6 @@ In addition to the directories, the project includes files responsible for appli
 - **Styling**: **Tailwind CSS** and **shadcn/ui** for a modern and responsive design system.
 - **State Management**: **Zustand** for lightweight and simple global state management.
 
-Aqui está a versão **corrigida e mais natural em inglês**, mantendo seu conteúdo:
-
 #### Other Technologies
 
 - **react-hook-form** and **zod**: Used for form handling and validation across the application.
