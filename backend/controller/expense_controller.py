@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, Query
 from fastapi.responses import JSONResponse
+from sqlalchemy.orm import Session
 from schemas.expense_schema import (
     ExpenseCreate,
     ExpenseFilter,
@@ -18,6 +19,7 @@ from services.expense_service import (
     update_expense,
 )
 from utils.auth import require_token_valid
+from database import get_db
 
 router = APIRouter(
     prefix="/api/expenses",
@@ -27,81 +29,63 @@ router = APIRouter(
 
 
 @router.post("/create", response_model=ExpenseRead)
-def create_expense_route(expense: ExpenseCreate):
-    """
-    Create a new expense for a user.
-    """
+def create_expense_route(expense: ExpenseCreate, db: Session = Depends(get_db)):
+    """Create a new expense for a user."""
 
-    return create_expense(expense=expense)
+    return create_expense(expense=expense, db=db)
 
 
 @router.get("/user_expenses", response_model=ExpensesList)
 def get_expenses_route(
-    user_id: int,
     page: int = Query(1, ge=1),
     per_page: int = Query(10, ge=1, le=100),
     filters: ExpenseFilter = Depends(),
+    db: Session = Depends(get_db),
 ):
-    """
-    Get all the expenses of a specific user.
-    """
+    """Get all the expenses of a specific user."""
 
     return get_expenses(
-        user_id=user_id,
         page=page,
         per_page=per_page,
-        label_id=filters.label_id,
-        sort_by=filters.sort_by,
-        order=filters.order,
-        start_date=filters.start_date,
-        end_date=filters.end_date,
-        card_name=filters.card_name,
-        payment_type=filters.payment_type,
+        filters=filters,
+        db=db,
     )
 
 
 @router.get("/user_expense", response_model=ExpenseRead)
-def get_expense_route(
-    expense_id: int,
-):
-    """
-    Get returned an expense by it's id
-    """
+def get_expense_route(expense_id: int, db: Session = Depends(get_db)):
+    """Get an expense by its id."""
 
-    return get_expense(expense_id=expense_id)
+    return get_expense(expense_id=expense_id, db=db)
 
 
 @router.delete("/delete_expenses")
-def delete_expenses_route(expense_ids: list[int]) -> JSONResponse:
-    """
-    Receive a list of expense IDs and repeat for all of them, deleting them
-    """
+def delete_expenses_route(
+    expense_ids: list[int], db: Session = Depends(get_db)
+) -> JSONResponse:
+    """Receive a list of expense IDs and delete all of them."""
 
-    return delete_expenses(expense_ids=expense_ids)
+    return delete_expenses(expense_ids=expense_ids, db=db)
 
 
 @router.delete("/delete_expense")
-def delete_expense_route(expense_id: int) -> JSONResponse:
-    """
-    Receive an expense id and delete it.
-    """
+def delete_expense_route(
+    expense_id: int, db: Session = Depends(get_db)
+) -> JSONResponse:
+    """Receive an expense id and delete it."""
 
-    return delete_expense(expense_id=expense_id)
+    return delete_expense(expense_id=expense_id, db=db)
 
 
 @router.put("/update_expense", response_model=ExpenseRead)
-def update_expense_route(expense_data: ExpenseUpdate):
-    """
-    Update an expense by its id.
-    """
+def update_expense_route(expense_data: ExpenseUpdate, db: Session = Depends(get_db)):
+    """Update an expense by its id."""
 
-    return update_expense(expense_data=expense_data)
+    return update_expense(expense_data=expense_data, db=db)
 
 
 @router.get("/monthly_status", response_model=ExpensesStatus)
-def get_monthly_status_route(user_id: int):
-    """
-    Get the monthly status.
-    """
+def get_monthly_status_route(user_id: int, db: Session = Depends(get_db)):
+    """Get the monthly status."""
 
-    return get_monthly_status(user_id=user_id)
+    return get_monthly_status(user_id=user_id, db=db)

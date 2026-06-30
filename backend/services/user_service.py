@@ -1,6 +1,7 @@
-from database import SessionLocal
 from fastapi import HTTPException, status
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
 from models.user import User
 from schemas.user_schema import (
     UserAuth,
@@ -17,18 +18,26 @@ from utils.security import hash_password, verify_password
 from decimal import Decimal
 
 
-def create_user(user_data: UserCreate) -> UserLoginReturn | JSONResponse:
-    db = SessionLocal()
+def get_user_or_404(user_id: int, db: Session) -> User:
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found in our database.",
+        )
+    return user
+
+
+def create_user(user_data: UserCreate, db: Session) -> UserLoginReturn:
+    user = db.query(User).filter(User.email == user_data.email).first()
+
+    if user:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Already a user created with this e-mail!",
+        )
 
     try:
-        user = db.query(User).filter(User.email == user_data.email).first()
-
-        if user:
-            return JSONResponse(
-                status_code=status.HTTP_409_CONFLICT,
-                content={"message": "Already a user created with this e-mail!"},
-            )
-
         new_user = User(
             name=user_data.name,
             email=user_data.email,
@@ -47,80 +56,41 @@ def create_user(user_data: UserCreate) -> UserLoginReturn | JSONResponse:
         return UserLoginReturn(
             auth=UserAuth(access_token=token, token_type="bearer"), id=new_user.id
         )
-    except Exception as e:
-        db.rollback()
-
+    except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"An error occured when trying to create a user: {e}",
         )
-    finally:
-        db.close()
 
 
-def login(user_data: UserLogin) -> UserLoginReturn | JSONResponse:
-    db = SessionLocal()
+def login(user_data: UserLogin, db: Session) -> UserLoginReturn:
+    user = db.query(User).filter(User.email == user_data.email).first()
 
-    try:
-        user = db.query(User).filter(User.email == user_data.email).first()
-
-        if not user or not verify_password(
-            plain_password=user_data.password, hashed_password=user.password
-        ):
-            return JSONResponse(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                content={"message": "Wrong password or e-mail!"},
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-
-        token = create_access_token(data={"sub": user.email})
-
-        return UserLoginReturn(
-            auth=UserAuth(access_token=token, token_type="bearer"), id=user.id
-        )
-    except Exception as e:
+    if not user or not verify_password(
+        plain_password=user_data.password, hashed_password=user.password
+    ):
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"An error occured when trying to auth: {e}",
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Wrong password or e-mail!",
+            headers={"WWW-Authenticate": "Bearer"},
         )
-    finally:
-        db.close()
+
+    token = create_access_token(data={"sub": user.email})
+
+    return UserLoginReturn(
+        auth=UserAuth(access_token=token, token_type="bearer"), id=user.id
+    )
 
 
-def get_user(user_id: UserIdentifier) -> UserBase | JSONResponse:
-    db = SessionLocal()
+def get_user(user_id: UserIdentifier, db: Session) -> UserBase:
+    user = get_user_or_404(user_id.id, db)
+    return UserBase.model_validate(user)
+
+
+def delete_user(user_id: UserIdentifier, db: Session) -> JSONResponse:
+    user = get_user_or_404(user_id.id, db)
 
     try:
-        user = db.query(User).filter(User.id == user_id.id).first()
-
-        if not user:
-            return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
-                content={"message": "Current user not found in our database."},
-            )
-
-        return UserBase.model_validate(user)
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"An error occured when trying to get an user: {e}",
-        )
-    finally:
-        db.close()
-
-
-def delete_user(user_id: UserIdentifier) -> JSONResponse:
-    db = SessionLocal()
-
-    try:
-        user = db.query(User).filter(User.id == user_id.id).first()
-
-        if not user:
-            return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
-                content={"message": "User not found in our database."},
-            )
-
         db.delete(user)
         db.commit()
 
@@ -128,29 +98,17 @@ def delete_user(user_id: UserIdentifier) -> JSONResponse:
             content={"message": "User deleted successfully!"},
             status_code=status.HTTP_200_OK,
         )
-    except Exception as e:
-        db.rollback()
-
+    except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"An error occured when trying to delete an user: {e}",
         )
-    finally:
-        db.close()
 
 
-def update_user(user_data: UserBase) -> UserBase | JSONResponse:
-    db = SessionLocal()
+def update_user(user_data: UserBase, db: Session) -> UserBase:
+    user = get_user_or_404(user_data.id, db)
 
     try:
-        user = db.query(User).filter(User.id == user_data.id).first()
-
-        if not user:
-            return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
-                content={"message": "Current user not found in our database."},
-            )
-
         user.name = user_data.name
         user.email = user_data.email
         user.birthday = user_data.birthday
@@ -160,37 +118,26 @@ def update_user(user_data: UserBase) -> UserBase | JSONResponse:
         db.commit()
         db.refresh(user)
 
-        return user
-    except Exception as e:
-        db.rollback()
-
+        return UserBase.model_validate(user)
+    except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"An error occured when trying to update an user: {e}",
         )
-    finally:
-        db.close()
 
 
-def update_user_password(user_data: UserUpdatePassword) -> JSONResponse:
-    db = SessionLocal()
+def update_user_password(user_data: UserUpdatePassword, db: Session) -> JSONResponse:
+    user = get_user_or_404(user_data.id, db)
+
+    if not verify_password(
+        plain_password=user_data.old_password, hashed_password=user.password
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="The old password is wrong.",
+        )
 
     try:
-        user = db.query(User).filter(User.id == user_data.id).first()
-
-        if not user:
-            return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
-                content={"message": "Current user not found in our database."},
-            )
-        if not verify_password(
-            plain_password=user_data.old_password, hashed_password=user.password
-        ):
-            return JSONResponse(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                content={"message": "The old password is wrong."},
-            )
-
         user.password = hash_password(user_data.new_password)
 
         db.commit()
@@ -200,31 +147,19 @@ def update_user_password(user_data: UserUpdatePassword) -> JSONResponse:
             content={"message": "Password updated successfully!"},
             status_code=status.HTTP_200_OK,
         )
-    except Exception as e:
-        db.rollback()
-
+    except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"An error occured when trying to update an user password: {e}",
         )
-    finally:
-        db.close()
 
 
 def update_monthly_revenue(
-    user_id: UserIdentifier, monthly_revenue: Decimal
+    user_id: UserIdentifier, monthly_revenue: Decimal, db: Session
 ) -> JSONResponse:
-    db = SessionLocal()
+    user = get_user_or_404(user_id.id, db)
 
     try:
-        user = db.query(User).filter(User.id == user_id.id).first()
-
-        if not user:
-            return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
-                content={"message": "Current user not found in our database."},
-            )
-
         user.monthly_revenue = monthly_revenue
 
         db.commit()
@@ -234,29 +169,17 @@ def update_monthly_revenue(
             content={"message": "Monthly revenue updated successfully!"},
             status_code=status.HTTP_200_OK,
         )
-    except Exception as e:
-        db.rollback()
-
+    except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"An error occured when trying to update an user data: {e}",
         )
-    finally:
-        db.close()
 
 
-def update_user_info(user_data: UpdatePersonalInfo) -> UserBase | JSONResponse:
-    db = SessionLocal()
+def update_user_info(user_data: UpdatePersonalInfo, db: Session) -> JSONResponse:
+    user = get_user_or_404(user_data.id, db)
 
     try:
-        user = db.query(User).filter(User.id == user_data.id).first()
-
-        if not user:
-            return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
-                content={"message": "Current user not found in our database."},
-            )
-
         user.name = user_data.name
         user.email = user_data.email
         user.birthday = user_data.birthday
@@ -268,12 +191,8 @@ def update_user_info(user_data: UpdatePersonalInfo) -> UserBase | JSONResponse:
             content={"message": "User personal information updated succesfully!"},
             status_code=status.HTTP_200_OK,
         )
-    except Exception as e:
-        db.rollback()
-
+    except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"An error occured when trying to update an user data: {e}",
         )
-    finally:
-        db.close()

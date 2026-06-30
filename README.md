@@ -57,6 +57,8 @@ To run this project locally, you will need Docker and Docker Compose installed o
 
 The project architecture is organized into directories that separate the responsibilities of the application, improving code organization, maintainability, and scalability.
 
+The project follows a **\*\***Layered Architecture**\*\*** (also known as **\*\***N-Tier Architecture**\*\***), more specifically the **\*\***Controller-Service pattern**\*\***, where each layer has a single, well-defined responsibility. This promotes separation of concerns, making the codebase easier to test, maintain, and scale.
+
 **- alembic/**
 Responsible for database migrations, allowing the database schema to be versioned and updated in a controlled way over time.
 

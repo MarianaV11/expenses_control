@@ -76,6 +76,8 @@ class ExpenseSortField(str, Enum):
 
 
 class ExpenseFilter(BaseModel):
+    user_id: int
+
     sort_by: ExpenseSortField = ExpenseSortField.day
     order: SortOrder
     start_date: Optional[date] = None

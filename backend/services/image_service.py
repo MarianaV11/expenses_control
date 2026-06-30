@@ -1,39 +1,46 @@
 from io import BytesIO
 
-from database import SessionLocal
 from fastapi import HTTPException, status
 from fastapi.responses import JSONResponse, StreamingResponse
 from models.image import Image
 from models.user import User
 from schemas.image_schema import ImageCreate, ImageRead
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
 
 
-def attach_profile(image_data: ImageCreate) -> ImageRead | JSONResponse:
-    db = SessionLocal()
+def get_profile_or_404(user_id: int, db: Session) -> Image:
+    image = db.query(Image).filter(Image.user_id == user_id, Image.is_profile).first()
+    if not image:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Profile image not found in our database.",
+        )
+    return image
 
-    try:
-        user_id = db.query(User).filter(User.id == image_data.user_id).first()
 
-        if not user_id:
-            return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
-                content={
-                    "message": f"User id of {image_data.user_id} not found in database."
-                },
-            )
+def attach_profile(image_data: ImageCreate, db: Session) -> ImageRead:
+    user = db.query(User).filter(User.id == image_data.user_id).first()
 
-        existing_profile_image = (
-            db.query(Image)
-            .filter(Image.user_id == image_data.user_id, Image.is_profile)
-            .first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User id of {image_data.user_id} not found in database.",
         )
 
-        if existing_profile_image:
-            return JSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content={"message": "Profile image already exists for this user."},
-            )
+    existing_profile_image = (
+        db.query(Image)
+        .filter(Image.user_id == image_data.user_id, Image.is_profile)
+        .first()
+    )
 
+    if existing_profile_image:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Profile image already exists for this user.",
+        )
+
+    try:
         new_image = Image(
             name=image_data.name,
             mime_type=image_data.mime_type,
@@ -47,59 +54,27 @@ def attach_profile(image_data: ImageCreate) -> ImageRead | JSONResponse:
         db.refresh(new_image)
 
         return new_image
-    except Exception as e:
-        db.rollback()
-
+    except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"An error occurred when trying to create an image: {e}",
         )
-    finally:
-        db.close()
 
 
-def get_profile(user_id: int) -> StreamingResponse | JSONResponse:
-    db = SessionLocal()
+def get_profile(user_id: int, db: Session) -> StreamingResponse:
+    image = get_profile_or_404(user_id, db)
 
-    try:
-        image = (
-            db.query(Image).filter(Image.user_id == user_id, Image.is_profile).first()
-        )
-
-        if not image:
-            return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
-                content={"message": "User image not found."},
-            )
-
-        return StreamingResponse(
-            media_type=image.mime_type,
-            content=BytesIO(image.data),
-            headers={"Content-Disposition": f"inline; filename={image.name}"},
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"An error occurred when trying to get an image: {e}",
-        )
-    finally:
-        db.close()
+    return StreamingResponse(
+        media_type=image.mime_type,
+        content=BytesIO(image.data),
+        headers={"Content-Disposition": f"inline; filename={image.name}"},
+    )
 
 
-def update_profile(user_id: int, image_data: ImageCreate) -> JSONResponse:
-    db = SessionLocal()
+def update_profile(user_id: int, image_data: ImageCreate, db: Session) -> JSONResponse:
+    image = get_profile_or_404(user_id, db)
 
     try:
-        image = (
-            db.query(Image).filter(Image.user_id == user_id, Image.is_profile).first()
-        )
-
-        if not image:
-            return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
-                content={"message": "User image not found."},
-            )
-
         image.name = image_data.name
         image.mime_type = image_data.mime_type
         image.data = image_data.data
@@ -114,33 +89,17 @@ def update_profile(user_id: int, image_data: ImageCreate) -> JSONResponse:
                 "id": image.id,
             },
         )
-    except Exception as e:
-        db.rollback()
-
+    except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"An error occurred when trying to update an image: {e}",
         )
-    finally:
-        db.close()
 
 
-def delete_profile(user_id: int) -> JSONResponse:
-    db = SessionLocal()
+def delete_profile(user_id: int, db: Session) -> JSONResponse:
+    image = get_profile_or_404(user_id, db)
 
     try:
-        image = (
-            db.query(Image).filter(Image.user_id == user_id, Image.is_profile).first()
-        )
-
-        if not image:
-            return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
-                content={
-                    "message": "Image of profile not founded in our database.",
-                },
-            )
-
         db.delete(image)
         db.commit()
 
@@ -148,12 +107,8 @@ def delete_profile(user_id: int) -> JSONResponse:
             status_code=status.HTTP_200_OK,
             content={"message": "Image deleted succesfully!"},
         )
-    except Exception as e:
-        db.rollback()
-
+    except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"An error occurred when trying to delete an image: {e}",
         )
-    finally:
-        db.close()
