@@ -47,10 +47,10 @@ const SpendingHistory = () => {
       );
   };
 
-  const setCurrentMonthlySnapshot = (snapshotId: number) => {
+  const setCurrentMonthlySnapshot = (yearMonth: string) => {
     const snapshot: MonthlySnapshot | undefined =
       monthlySnapshots?.snapshots.find(
-        (item: MonthlySnapshot) => item.id === snapshotId,
+        (item: MonthlySnapshot) => item.year_month === yearMonth,
       );
 
     snapshot && setCurrentSnapshot(snapshot);
@@ -64,12 +64,12 @@ const SpendingHistory = () => {
           {monthlySnapshots?.snapshots &&
             monthlySnapshots?.snapshots.map((snapshot: MonthlySnapshot) => (
               <SpendingHistoryCard
-                key={snapshot.id}
+                key={snapshot.year_month}
                 currentRevenue={snapshot.current_revenue}
                 totalByLabel={snapshot.total_by_label}
                 totalSpent={snapshot.total_spent}
                 yearMonth={snapshot.year_month}
-                onClick={() => setCurrentMonthlySnapshot(snapshot.id)}
+                onClick={() => setCurrentMonthlySnapshot(snapshot.year_month)}
               />
             ))}
         </div>

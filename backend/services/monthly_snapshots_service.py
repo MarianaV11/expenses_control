@@ -1,8 +1,8 @@
+import calendar
 from datetime import date
 
 from fastapi import HTTPException, status
 from models.expense import Expense
-from models.monthly_snapshots import MonthlySnapshot
 from models.user import User
 from schemas.monthly_snapshots_schema import (
     MonthlySnapshotRead,
@@ -72,111 +72,47 @@ def calculate_month_metrics(
     }
 
 
-def create_monthly_snapshot(db: Session, start: date, end: date) -> None:
-    year_month = f"{start.year}-{start.month:02d}"
-
-    users = db.query(User).all()
-
-    for user in users:
-        already_exists = (
-            db.query(MonthlySnapshot)
-            .filter(
-                MonthlySnapshot.user_id == user.id,
-                MonthlySnapshot.year_month == year_month,
-            )
-            .first()
-        )
-        if already_exists:
-            continue
-
-        metrics = calculate_month_metrics(db, user.id, start, end)
-
-        if not metrics:
-            continue
-
-        try:
-            snapshot = MonthlySnapshot(
-                user_id=user.id,
-                current_revenue=user.monthly_revenue,
-                year_month=year_month,
-                total_spent=metrics["total_spent"],
-                total_by_label=metrics["total_by_label"],
-                percentage_by_label=metrics["percentage_by_label"],
-                total_by_payment_type=metrics["total_by_payment_type"],
-                total_by_card=metrics["total_by_card"],
-                started_at=metrics["started_at"],
-                ended_at=metrics["ended_at"],
-            )
-            db.add(snapshot)
-            db.commit()
-            db.refresh(snapshot)
-        except SQLAlchemyError as e:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"An error occured when trying to create monthly snapshot: {e}",
-            )
-
-
 def get_monthly_snapshots(
     user_id: int, page: int, per_page: int, db: Session
 ) -> MonthlySnapshotsList:
-    total_snapshots = (
-        db.query(MonthlySnapshot).filter(MonthlySnapshot.user_id == user_id).count()
-    )
-    total_page = max((total_snapshots + per_page - 1) // per_page, 1)
-
-    if page < 1:
-        page = 1
-
-    if page > total_page:
-        return MonthlySnapshotsList(
-            page=page,
-            total_page=total_page,
-            total_snapshots=total_snapshots,
-            snapshots=[],
-        )
-
-    skip = (page - 1) * per_page
-
+    year = func.extract("year", Expense.day)
+    month = func.extract("month", Expense.day)
     try:
-        snapshots = (
-            db.query(MonthlySnapshot)
-            .filter(MonthlySnapshot.user_id == user_id)
-            .order_by(MonthlySnapshot.year_month.desc())
-            .offset(skip)
-            .limit(per_page)
+        months = (
+            db.query(year, month)
+            .filter(Expense.user_id == user_id)
+            .group_by(year, month)
+            .order_by(year.desc(), month.desc())
             .all()
         )
+        user = db.get(User, user_id)
+
+        total_snapshots = len(months)
+        total_page = max((total_snapshots + per_page - 1) // per_page, 1)
+        skip = (page - 1) * per_page
+
+        snapshots = []
+        for y, m in months[skip : skip + per_page]:
+            y, m = int(y), int(m)
+            start = date(y, m, 1)
+            end = date(y, m, calendar.monthrange(y, m)[1])
+            snapshots.append(
+                MonthlySnapshotRead(
+                    year_month=f"{y}-{m:02d}",
+                    current_revenue=float(user.monthly_revenue or 0),
+                    user_id=user_id,
+                    **calculate_month_metrics(db, user_id, start, end),
+                )
+            )
 
         return MonthlySnapshotsList(
             page=page,
             total_page=total_page,
             total_snapshots=total_snapshots,
-            snapshots=[
-                MonthlySnapshotRead.model_validate(snapshot) for snapshot in snapshots
-            ],
+            snapshots=snapshots,
         )
     except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"An error occured when trying to get monthly snapshots: {e}",
         )
-
-
-def get_monthly_snapshot_by_id(
-    snapshot_id: int, user_id: int, db: Session
-) -> MonthlySnapshotRead:
-    snapshot = (
-        db.query(MonthlySnapshot)
-        .filter(MonthlySnapshot.id == snapshot_id)
-        .filter(MonthlySnapshot.user_id == user_id)
-        .first()
-    )
-
-    if not snapshot:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Monthly snapshot not found",
-        )
-
-    return MonthlySnapshotRead.model_validate(snapshot)

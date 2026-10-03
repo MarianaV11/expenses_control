@@ -24,6 +24,3 @@ class User(BASE):
         "Expense", back_populates="user", cascade="all, delete-orphan"
     )
     labels = relationship("Label", back_populates="user", cascade="all, delete-orphan")
-    monthly_snapshots = relationship(
-        "MonthlySnapshot", back_populates="user", cascade="all, delete-orphan"
-    )

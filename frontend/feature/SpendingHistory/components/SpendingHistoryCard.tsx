@@ -20,6 +20,8 @@ const SpendingHistoryCard = ({
   onClick,
 }: SpendingHistoryCardProps) => {
   const totalRemaining = currentRevenue - totalSpent;
+  const spentPercentage =
+    currentRevenue > 0 ? (totalSpent / currentRevenue) * 100 : 0;
 
   return (
     <Card
@@ -60,10 +62,10 @@ const SpendingHistoryCard = ({
           <p className="text-sm font-light">Revenue Expenditure</p>
           <Progress
             className="w-full"
-            value={(totalSpent / currentRevenue) * 100}
+            value={spentPercentage}
           />
           <p className="text-sm font-light absolute top-0 right-0 max-sm:hidden">
-            {((totalSpent / currentRevenue) * 100).toFixed(2)}%
+            {spentPercentage.toFixed(2)}%
           </p>
         </div>
         <div className="mt-4">

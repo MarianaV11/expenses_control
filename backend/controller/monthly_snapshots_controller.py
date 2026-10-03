@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
-from schemas.monthly_snapshots_schema import MonthlySnapshotRead, MonthlySnapshotsList
+from schemas.monthly_snapshots_schema import MonthlySnapshotsList
 from services.monthly_snapshots_service import (
-    get_monthly_snapshot_by_id,
     get_monthly_snapshots,
 )
 from utils.auth import require_token_valid
@@ -15,13 +14,6 @@ router = APIRouter(
 )
 
 
-@router.get("/snapshot", response_model=MonthlySnapshotRead)
-def get_monthly_snapshot_by_id_route(
-    snapshot_id: int, user_id: int, db: Session = Depends(get_db)
-):
-    """Get a specific monthly snapshot by id."""
-
-    return get_monthly_snapshot_by_id(snapshot_id=snapshot_id, user_id=user_id, db=db)
 
 
 @router.get("/snapshots", response_model=MonthlySnapshotsList)

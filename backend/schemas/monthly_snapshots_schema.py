@@ -3,11 +3,8 @@ from datetime import datetime
 from pydantic import BaseModel
 
 
-class MonthlySnapshotBase(BaseModel):
-    id: int
 
-
-class MonthlySnapshotRead(MonthlySnapshotBase):
+class MonthlySnapshotRead(BaseModel):
     current_revenue: float
     year_month: str
     total_spent: float
