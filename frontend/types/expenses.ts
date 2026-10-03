@@ -35,6 +35,8 @@ export type ExpenseCreate = {
   card: string;
   payment_type: string;
   label_id: number | null;
+  installments?: number;
+  recurring?: boolean;
 };
 
 export type ExpenseUpdate = ExpenseCreate & ExpenseIdentifier;

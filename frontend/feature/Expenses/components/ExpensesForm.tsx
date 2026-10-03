@@ -33,6 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { axios } from "@/service/axios_config";
 import { getUser } from "@/service/local_storage";
@@ -43,7 +44,7 @@ import { Label, LabelIdentifier } from "@/types/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AxiosError, AxiosResponse } from "axios";
 import { format } from "date-fns";
-import { CalendarIcon, MoreHorizontal, Plus } from "lucide-react";
+import { CalendarIcon, Minus, MoreHorizontal, Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import CurrencyInput from "react-currency-input-field";
 import { useForm } from "react-hook-form";
@@ -57,6 +58,8 @@ const ExpensesSchema = z.object({
   card: z.string().min(1, { message: "Select an option above!" }),
   payment_type: z.string().min(1, { message: "Select an option above!" }),
   label_id: z.string().nullable(),
+  installments: z.number().int().min(1).max(48),
+  recurring: z.boolean(),
 });
 type ExpensesSchemaType = z.infer<typeof ExpensesSchema>;
 
@@ -82,8 +85,12 @@ const ExpensesForm = ({
       card: currentExpense?.card ?? "",
       payment_type: currentExpense?.payment_type ?? "",
       label_id: String(currentExpense?.label_id) ?? null,
+      installments: 1,
+      recurring: false,
     },
   });
+  const paymentType = form.watch("payment_type");
+  const installments = form.watch("installments");
   const [options, setOptions] = useState<Label[]>([]);
   const [openLabelDialog, setOpenLabelDialog] = useState<boolean>(false);
   const [labelData, setLabelData] = useState<Label | null>(null);
@@ -122,6 +129,8 @@ const ExpensesForm = ({
       day: new Intl.DateTimeFormat("sv-SE").format(values.day),
       label_id: values.label_id ? Number(values.label_id) : null,
       payment_type: values.payment_type,
+      installments: values.payment_type === "Credit" ? values.installments : 1,
+      recurring: values.recurring,
     };
 
     axios.post("expenses/create", body).then(onSuccess).catch(onError);
@@ -206,6 +215,8 @@ const ExpensesForm = ({
       label_id: String(currentExpense?.label_id) ?? null,
       payment_type: currentExpense?.payment_type ?? "",
       value: currentExpense?.value ?? 0,
+      installments: 1,
+      recurring: false,
     };
 
     form.reset(apllyColumnInformation);
@@ -371,6 +382,61 @@ const ExpensesForm = ({
               )}
             />
           </div>
+          {!currentExpense && paymentType === "Credit" && (
+            <FormField
+              control={form.control}
+              name="installments"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-bold">Installments</FormLabel>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      disabled={field.value <= 1}
+                      onClick={() => field.onChange(field.value - 1)}
+                    >
+                      <Minus />
+                    </Button>
+                    <span className="w-12 text-center font-semibold">
+                      {field.value}x
+                    </span>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      disabled={field.value >= 48}
+                      onClick={() => field.onChange(field.value + 1)}
+                    >
+                      <Plus />
+                    </Button>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
+          {!currentExpense &&
+            !(paymentType === "Credit" && installments > 1) && (
+              <FormField
+                control={form.control}
+                name="recurring"
+                render={({ field }) => (
+                  <FormItem className="flex items-center gap-2">
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormLabel className="font-bold !mt-0">
+                      Recurring (repeats monthly for 12 months)
+                    </FormLabel>
+                  </FormItem>
+                )}
+              />
+            )}
           <FormField
             control={form.control}
             name="label_id"

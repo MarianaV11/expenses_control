@@ -3,7 +3,7 @@ from decimal import Decimal
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, Field, model_validator
 
 
 class ExpenseBase(BaseModel):
@@ -25,6 +25,8 @@ class ExpenseCreate(BaseModel):
     card: str
     payment_type: str
     label_id: Optional[int]
+    installments: int = Field(1, ge=1, le=48)
+    recurring: bool = False
 
 
 class ExpenseUpdate(BaseModel):

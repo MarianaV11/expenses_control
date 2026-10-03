@@ -1,22 +1,23 @@
-from datetime import datetime
+import calendar
+from datetime import date, datetime
 from decimal import Decimal
 
 from fastapi import HTTPException, status
 from fastapi.responses import JSONResponse
-from sqlalchemy import asc, desc
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session
-from sqlalchemy.sql import extract, func
 from models.expense import Expense
 from models.user import User
 from schemas.expense_schema import (
     ExpenseCreate,
+    ExpenseFilter,
     ExpenseRead,
     ExpensesList,
     ExpensesStatus,
     ExpenseUpdate,
-    ExpenseFilter,
 )
+from sqlalchemy import asc, desc
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
+from sqlalchemy.sql import extract, func
 
 
 def get_expense_or_404(expense_id: int, db: Session) -> Expense:
@@ -29,23 +30,37 @@ def get_expense_or_404(expense_id: int, db: Session) -> Expense:
     return expense
 
 
+def add_months(day: date, months: int) -> date:
+    month = day.month - 1 + months
+    year, month = day.year + month // 12, month % 12 + 1
+    return date(year, month, min(day.day, calendar.monthrange(year, month)[1]))
+
+
 def create_expense(expense: ExpenseCreate, db: Session) -> ExpenseRead:
+    installment = expense.installments > 1
+    n = expense.installments if installment else (12 if expense.recurring else 1)
+    total = Decimal(str(expense.value))
+    each = round(total / n, 2) if installment else total
+
     try:
-        new_expense = Expense(
-            name=expense.name,
-            day=expense.day,
-            value=expense.value,
-            card=expense.card,
-            payment_type=expense.payment_type,
-            user_id=expense.user_id,
-            label_id=expense.label_id,
-        )
+        rows = [
+            Expense(
+                name=f"{expense.name} ({i + 1}/{n})" if installment else expense.name,
+                day=add_months(expense.day, i),
+                value=total - each * (n - 1) if installment and i == n - 1 else each,
+                card=expense.card,
+                payment_type=expense.payment_type,
+                user_id=expense.user_id,
+                label_id=expense.label_id,
+            )
+            for i in range(n)
+        ]
 
-        db.add(new_expense)
+        db.add_all(rows)
         db.commit()
-        db.refresh(new_expense)
+        db.refresh(rows[0])
 
-        return ExpenseRead.model_validate(new_expense)
+        return ExpenseRead.model_validate(rows[0])
     except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -93,13 +108,13 @@ def get_expenses(
             detail="No items on this page.",
         )
 
-    skip = (filters.page - 1) * filters.per_page
+    skip = (page - 1) * per_page
 
     try:
-        expenses = query.offset(skip).limit(filters.per_page).all()
+        expenses = query.offset(skip).limit(per_page).all()
 
         return ExpensesList(
-            page=filters.page,
+            page=page,
             total_page=total_page,
             total_expenses=total_expenses,
             expenses=[ExpenseRead.model_validate(expense) for expense in expenses],
