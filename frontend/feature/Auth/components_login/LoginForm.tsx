@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import StyledButton from "@/components/external/Button";
 import {
   Form,
   FormControl,
@@ -125,14 +125,11 @@ const LoginForm = () => {
             </FormItem>
           )}
         />
-        <Button
-          type="submit"
-          size="lg"
-          className="mt-2 w-full"
-          disabled={form.formState.isSubmitting}
-        >
-          {form.formState.isSubmitting ? "Signing in..." : "Sign in"}
-        </Button>
+        <div className="mt-4">
+          <StyledButton type="submit" disabled={form.formState.isSubmitting}>
+            Login
+          </StyledButton>
+        </div>
       </form>
     </Form>
   );

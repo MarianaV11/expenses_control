@@ -5,7 +5,7 @@ interface LoginTaglineProps {
 const LoginTagline = ({ onRegisterClick }: LoginTaglineProps) => {
   return (
     <div className="max-w-md max-md:hidden">
-      <h1 className="text-6xl font-extrabold mb-5 bg-gradient-to-r from-[#1e3a8a] to-[#60a5fa] dark:from-white dark:to-[#bfdbfe] bg-clip-text text-transparent">
+      <h1 className="text-6xl font-extrabold mb-5 pb-2 bg-gradient-to-r from-[#1e3a8a] to-[#60a5fa] dark:from-white dark:to-[#bfdbfe] bg-clip-text text-transparent">
         Welcome back
       </h1>
       <p className="text-2xl text-muted-foreground">

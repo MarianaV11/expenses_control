@@ -1,6 +1,6 @@
 "use client";
 
-import StyledRegisterButton from "@/components/external/Button";
+import StyledButton from "@/components/external/Button";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -26,9 +26,9 @@ import { UserCreate } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AxiosError, AxiosResponse } from "axios";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Eye, EyeOff, Lock, Mail, User } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -42,6 +42,7 @@ type RegisterSchemaType = z.infer<typeof RegisterSchema>;
 
 const RegisterForm = () => {
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
   const form = useForm<RegisterSchemaType>({
     resolver: zodResolver(RegisterSchema),
     defaultValues: {
@@ -84,7 +85,7 @@ const RegisterForm = () => {
         is_admin: false,
       };
 
-      axios.post("auth/create", body).then(onSuccess).catch(onError);
+      return axios.post("auth/create", body).then(onSuccess).catch(onError);
     },
     [router],
   );
@@ -92,7 +93,7 @@ const RegisterForm = () => {
   return (
     <Form {...form}>
       <form
-        className="flex flex-col gap-5"
+        className="flex flex-col gap-4"
         onSubmit={form.handleSubmit(onSubmit)}
       >
         <FormField
@@ -100,10 +101,18 @@ const RegisterForm = () => {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="font-bold">Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Your name comes here" {...field} />
-              </FormControl>
+              <FormLabel>Name</FormLabel>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <FormControl>
+                  <Input
+                    className="pl-9"
+                    placeholder="Your name"
+                    autoComplete="name"
+                    {...field}
+                  />
+                </FormControl>
+              </div>
               <FormMessage />
             </FormItem>
           )}
@@ -113,9 +122,9 @@ const RegisterForm = () => {
           name="birthdate"
           render={({ field }) => (
             <FormItem className="flex flex-col w-full">
-              <FormLabel className=" font-bold">Date of Birth</FormLabel>
+              <FormLabel>Date of Birth</FormLabel>
               <Popover>
-                <PopoverTrigger asChild className="bg-slate-background">
+                <PopoverTrigger asChild>
                   <FormControl>
                     <Button
                       variant={"outline"}
@@ -124,12 +133,12 @@ const RegisterForm = () => {
                         !field.value && "text-muted-foreground",
                       )}
                     >
+                      <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                       {field.value ? (
                         format(field.value, "PPP")
                       ) : (
                         <span>Pick a date</span>
                       )}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
@@ -154,10 +163,18 @@ const RegisterForm = () => {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="font-bold ">Email</FormLabel>
-              <FormControl>
-                <Input placeholder="Your email comes here" {...field} />
-              </FormControl>
+              <FormLabel>Email</FormLabel>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <FormControl>
+                  <Input
+                    className="pl-9"
+                    placeholder="you@example.com"
+                    autoComplete="email"
+                    {...field}
+                  />
+                </FormControl>
+              </div>
               <FormMessage />
             </FormItem>
           )}
@@ -166,20 +183,41 @@ const RegisterForm = () => {
           control={form.control}
           name="password"
           render={({ field }) => (
-            <FormItem className="mb-5">
-              <FormLabel className="font-bold ">Password</FormLabel>
-              <FormControl>
-                <Input
-                  type="password"
-                  placeholder="Your password comes here"
-                  {...field}
-                />
-              </FormControl>
+            <FormItem>
+              <FormLabel>Password</FormLabel>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <FormControl>
+                  <Input
+                    className="pl-9 pr-10"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                    {...field}
+                  />
+                </FormControl>
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((current) => !current)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
               <FormMessage />
             </FormItem>
           )}
         />
-        <StyledRegisterButton type="submit">Register</StyledRegisterButton>
+        <div className="mt-4">
+          <StyledButton type="submit" disabled={form.formState.isSubmitting}>
+            Register
+          </StyledButton>
+        </div>
       </form>
     </Form>
   );
