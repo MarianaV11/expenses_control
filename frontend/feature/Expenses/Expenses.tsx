@@ -8,7 +8,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
 import { axios } from "@/service/axios_config";
 import { getUser } from "@/service/local_storage";
 import { showToast } from "@/service/toast_service";
@@ -30,6 +29,7 @@ import {
   CreditCard,
   MoreHorizontal,
   Plus,
+  X,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import CommonDialog from "../../components/external/CommonDialog";
@@ -146,6 +146,8 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
   }, [getLabels]);
 
   const deleteExpense = (id: number) => {
+    if (!window.confirm("Delete this expense? This cannot be undone.")) return;
+
     axios
       .delete("/expenses/delete_expense", {
         params: { expense_id: id },
@@ -171,6 +173,7 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
       card_name: string | null = null,
       payment_type: string | null = null,
     ) => {
+      setPagination((current) => ({ ...current, page: 1 }));
       setFilter((current) => ({
         ...current,
         sort_by,
@@ -250,7 +253,11 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
             currency: "BRL",
           }).format(amount);
 
-          return <div className="text-center font-medium">{formatted}</div>;
+          return (
+            <div className="text-center font-semibold tabular-nums">
+              {formatted}
+            </div>
+          );
         },
       },
       {
@@ -286,7 +293,11 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
             "America/Sao_Paulo",
           );
           const formatted = format(zonedDate, "dd/MM/yyyy");
-          return <div className="text-center font-medium">{formatted}</div>;
+          return (
+            <div className="text-center text-muted-foreground tabular-nums">
+              {formatted}
+            </div>
+          );
         },
       },
       {
@@ -353,18 +364,23 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
           />
         ),
         cell: ({ row }) => {
+          const labelName = row.getValue<string | null>("label_name");
+
           return (
             <div className="text-center font-medium">
-              <Badge
-                variant="outline"
-                style={{ backgroundColor: row.original.label_color }}
-                className={cn(
-                  "border dark:hover:opacity-60 text-white",
-                  row.getValue("label_name") ?? "text-dark",
-                )}
-              >
-                {row.getValue("label_name") ?? "No label"}
-              </Badge>
+              {labelName ? (
+                <Badge
+                  variant="outline"
+                  style={{ backgroundColor: row.original.label_color }}
+                  className="border dark:hover:opacity-60 text-white"
+                >
+                  {labelName}
+                </Badge>
+              ) : (
+                <Badge variant="outline" className="text-muted-foreground">
+                  No label
+                </Badge>
+              )}
             </div>
           );
         },
@@ -388,7 +404,7 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
 
               <DropdownMenuItem
                 onClick={() => deleteExpense(row.original.id)}
-                className="font-bold text-red-700"
+                className="font-bold text-destructive focus:text-destructive"
               >
                 Delete
               </DropdownMenuItem>
@@ -414,13 +430,18 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
       );
   };
 
+  const hasActiveFilter =
+    filter.label_id !== null ||
+    filter.card_name !== null ||
+    filter.payment_type !== null;
+
   const closeDialog = () => {
     setOpenDialog((current) => !current);
   };
 
   return (
     <>
-      <div className="rounded-md border p-2 shadow-sm border-t-10 border-primary/50">
+      <div className="rounded-md border p-2 shadow-sm border-t-10 border-t-muted-foreground/20">
         <div className="flex justify-between p-2 max-md:flex-col max-md:space-y-4 max-md:items-center relative">
           <h1 className="text-center font-medium text-2xl mb-2">Expenses</h1>
           <ExpensesRangeDate
@@ -432,15 +453,29 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
           />
           <Button
             className="max-md:absolute top-0 right-0"
-            size="icon"
             onClick={() => {
               setSelectedData(null);
               setOpenDialog((current) => !current);
             }}
           >
             <Plus />
+            <span className="max-md:hidden">New expense</span>
           </Button>
         </div>
+
+        {hasActiveFilter && (
+          <div className="flex justify-end px-2 pb-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground"
+              onClick={() => changeFilters("day", "desc")}
+            >
+              <X />
+              Clear filters
+            </Button>
+          </div>
+        )}
 
         <ExpensesTable
           key={
@@ -450,7 +485,12 @@ const Expenses = ({ getMonthlyStatus }: ExpensesProps) => {
           data={data}
         />
 
-        <div className="flex items-center justify-end space-x-2 py-4 flex-1">
+        <div className="flex items-center justify-between gap-2 py-4 px-2 flex-1">
+          <p className="text-sm text-muted-foreground">
+            {objectData
+              ? `Page ${pagination.page} of ${objectData.total_page} · ${objectData.total_expenses} expenses`
+              : ""}
+          </p>
           <div className="space-x-2">
             <Button
               variant="outline"

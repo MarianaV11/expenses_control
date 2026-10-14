@@ -30,7 +30,7 @@ const ExpensesHeaderDropdown = ({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            className="ml-5 text-muted-foreground max-h-6 data-[state=open]:bg-slate-200 dark:data-[state=open]:bg-slate-700"
+            className="ml-5 text-muted-foreground max-h-6 data-[state=open]:bg-accent"
             variant="ghost"
           >
             {title} <ChevronsUpDown />

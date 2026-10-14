@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/popover";
 import { ExpenseFilter } from "@/types/expenses";
 import { format } from "date-fns-tz";
-import { ArrowRight, Timer } from "lucide-react";
+import { ArrowRight, CalendarIcon } from "lucide-react";
 import React from "react";
 
 interface ExpensesRangeDateProps {
@@ -32,10 +32,10 @@ const ExpensesRangeDate = ({ filter, setFilter }: ExpensesRangeDateProps) => {
   return (
     <div className="flex gap-4 items-center max-md:flex-col">
       <Popover>
-        <PopoverTrigger asChild className="bg-slate-background">
+        <PopoverTrigger asChild>
           <Button variant="outline">
             {format(filter.start_date, "PPP")}
-            <Timer className="ml-auto h-4 w-4 opacity-80 text-secondary" />
+            <CalendarIcon className="ml-auto h-4 w-4 opacity-80 text-secondary" />
           </Button>
         </PopoverTrigger>
 
@@ -53,10 +53,10 @@ const ExpensesRangeDate = ({ filter, setFilter }: ExpensesRangeDateProps) => {
       <ArrowRight className="h-5 w-5 opacity-50 text-secondary max-md:rotate-90" />
 
       <Popover>
-        <PopoverTrigger asChild className="bg-slate-background">
+        <PopoverTrigger asChild>
           <Button variant="outline">
             {format(filter.end_date, "PPP")}
-            <Timer className="ml-auto h-4 w-4 opacity-80 text-secondary" />
+            <CalendarIcon className="ml-auto h-4 w-4 opacity-80 text-secondary" />
           </Button>
         </PopoverTrigger>
 

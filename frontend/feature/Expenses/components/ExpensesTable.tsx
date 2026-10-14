@@ -72,7 +72,7 @@ const ExpensesTable = <TData, TValue>({
   return (
     <div className="overflow-hidden rounded-md border">
       <Table>
-        <TableHeader className="bg-slate-100 dark:bg-popover">
+        <TableHeader className="bg-muted/60">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
@@ -96,7 +96,7 @@ const ExpensesTable = <TData, TValue>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
-                className="hover:text-primary transition-colors duration-300 ease-in-out"
+                className="transition-colors"
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
@@ -108,7 +108,7 @@ const ExpensesTable = <TData, TValue>({
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                No expenses in this period.
               </TableCell>
             </TableRow>
           )}

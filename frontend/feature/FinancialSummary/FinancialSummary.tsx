@@ -24,26 +24,31 @@ const FinancialSummary = ({
     getMonthlyStatus();
   }, [getMonthlyStatus]);
 
+  const remaining = Number(monthlyStatus?.remaining_value ?? 0);
+  const isPositive = remaining >= 0;
+
   const closeDialog = () => {
     setOpenDialog((current) => !current);
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-12 p-5 relative rounded-lg border border-t-10 border-primary/50">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-12 p-5 relative rounded-lg border border-t-10 border-t-muted-foreground/20">
       <Button
         variant="ghost"
         className="absolute top-2 right-2 border-primary bg-primary/5"
+        aria-label="Edit monthly revenue"
+        title="Edit monthly revenue"
         onClick={() => setOpenDialog((current) => !current)}
       >
         <Edit size={20} className="text-primary" />
       </Button>
-      <Card className="p-6 hover:shadow-lg transition-all duration-300 border-l-4 border-l-primary">
+      <Card className="p-6 hover:shadow-lg transition-all duration-300 border-l-4 border-l-muted-foreground/20">
         <div className="flex items-center justify-between">
           <div className="w-full max-w-xs break-words overflow-hidden">
             <p className="text-sm text-muted-foreground mb-1">
               Monthly Revenue
             </p>
-            <p className="text-2xl font-bold text-foreground">
+            <p className="text-2xl font-bold tabular-nums text-foreground">
               {monthlyStatus
                 ? formatCurrency(Number(monthlyStatus?.monthly_revenue))
                 : "R$ 0,00"}
@@ -55,13 +60,13 @@ const FinancialSummary = ({
         </div>
       </Card>
 
-      <Card className="p-6 hover:shadow-lg transition-all duration-300 border-l-4 border-l-destructive">
+      <Card className="p-6 hover:shadow-lg transition-all duration-300 border-l-4 border-l-muted-foreground/20">
         <div className="flex items-center justify-between">
           <div className="w-full max-w-xs break-words overflow-hidden">
             <p className="text-sm text-muted-foreground mb-1">
               Monthly Expenses
             </p>
-            <p className="text-2xl font-bold text-foreground">
+            <p className="text-2xl font-bold tabular-nums text-foreground">
               {monthlyStatus
                 ? formatCurrency(Number(monthlyStatus?.total_expenses))
                 : "R$ 0,00"}
@@ -73,28 +78,30 @@ const FinancialSummary = ({
         </div>
       </Card>
 
-      <Card className="p-6 hover:shadow-lg transition-all duration-300 border-l-4 border-l-success">
+      <Card className="p-6 hover:shadow-lg transition-all duration-300 border-l-4 border-l-muted-foreground/20">
         <div className="flex items-center justify-between">
           <div className="w-full max-w-xs break-words overflow-hidden">
             <p className="text-sm text-muted-foreground mb-1">
               Remaining Balance
             </p>
             <p
-              className={`text-2xl font-bold ${
-                300 >= 0 ? "text-success" : "text-danger"
+              className={`text-2xl font-bold tabular-nums ${
+                isPositive ? "text-success" : "text-destructive"
               }`}
             >
-              {monthlyStatus
-                ? formatCurrency(Number(monthlyStatus?.remaining_value))
-                : "R$ 0,00"}
+              {formatCurrency(remaining)}
             </p>
           </div>
           <div
             className={`p-3 rounded-full max-md:hidden ${
-              300 >= 0 ? "bg-gradient-success" : "bg-gradient-danger"
+              isPositive ? "bg-gradient-success" : "bg-gradient-danger"
             }`}
           >
-            <TrendingUp className="text-white" />
+            {isPositive ? (
+              <TrendingUp className="w-6 h-6 text-white" />
+            ) : (
+              <TrendingDown className="w-6 h-6 text-white" />
+            )}
           </div>
         </div>
       </Card>

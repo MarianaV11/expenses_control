@@ -76,7 +76,7 @@ const SpendingHistoryMetrics = ({
   return (
     <div>
       <div className="grid grid-cols-3 gap-2 mb-4 max-md:grid-cols-1 max-md:gap-4">
-        <div className="text-lg border border-t-secondary border-t-4 p-2 text-center font-bold rounded-md">
+        <div className="text-lg border border-t-muted-foreground/20 border-t-4 p-2 text-center font-bold rounded-md">
           <p className="text-sm text-muted-foreground font-light">
             Current Revenue
           </p>
@@ -85,7 +85,7 @@ const SpendingHistoryMetrics = ({
             currency: "BRL",
           }).format(monthSnapshot.current_revenue)}
         </div>
-        <div className="text-lg border p-2 border-t-destructive border-t-4 text-center font-bold rounded-md">
+        <div className="text-lg border p-2 border-t-muted-foreground/20 border-t-4 text-center font-bold rounded-md">
           <p className="text-sm text-muted-foreground font-light">
             Total Spent
           </p>
@@ -94,7 +94,7 @@ const SpendingHistoryMetrics = ({
             currency: "BRL",
           }).format(monthSnapshot.total_spent)}
         </div>
-        <div className="text-lg border p-2 border-t-blue-400 border-t-4 text-center font-bold rounded-md">
+        <div className="text-lg border p-2 border-t-muted-foreground/20 border-t-4 text-center font-bold rounded-md">
           <p className="text-sm text-muted-foreground font-light">
             Remaining Value
           </p>
@@ -105,7 +105,7 @@ const SpendingHistoryMetrics = ({
         </div>
       </div>
       <div className="flex justify-center items-center gap-2 mb-4 max-md:flex-col">
-        <div className="border-t-10 rounded-md border p-2 flex-1">
+        <div className="border-t-10 border-t-muted-foreground/20 rounded-md border p-2 flex-1">
           <h2 className="font-medium m-4">Card Type</h2>
           <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
             <ResponsiveContainer width="100%" height={300}>
@@ -122,7 +122,7 @@ const SpendingHistoryMetrics = ({
             </ResponsiveContainer>
           </ChartContainer>
         </div>
-        <div className="border-t-10 rounded-md border p-2 flex-1">
+        <div className="border-t-10 border-t-muted-foreground/20 rounded-md border p-2 flex-1">
           <h2 className="font-medium m-4">Payment Type</h2>
           <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
             <ResponsiveContainer width="100%" height={300}>
@@ -141,7 +141,7 @@ const SpendingHistoryMetrics = ({
           </ChartContainer>
         </div>
       </div>
-      <div className="border-t-10 border p-2 rounded-2xl flex max-md:flex-col">
+      <div className="border-t-10 border-t-muted-foreground/20 border p-2 rounded-2xl flex max-md:flex-col">
         <div className="flex-1">
           <h2 className="font-medium ml-4">Label Type</h2>
           <ChartContainer config={chartConfig}>

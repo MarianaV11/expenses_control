@@ -22,8 +22,8 @@ const SidebarItem = ({
       className={cn(
         "relative flex items-center py-2 px-2 font-medium rounded-md cursor-pointer transition-colors mt-1 mb-1",
         active
-          ? "bg-indigo-200 dark:bg-gray-800"
-          : "hover:bg-indigo-50 hover:scale-105 transform transition-transform ease-in-out duration-300 text-gray-600 dark:hover:bg-card dark:text-slate-300",
+          ? "bg-muted text-foreground"
+          : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
         !showItem && "justify-center",
       )}
     >
@@ -39,7 +39,6 @@ const SidebarItem = ({
         className={cn(
           "text-nowrap text-sm transition-all duration-300 overflow-hidden",
           showItem ? "w-52 opacity-100 ml-3" : "w-0 opacity-0",
-          active && "text-primary",
         )}
       >
         {text}

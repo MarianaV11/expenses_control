@@ -141,7 +141,7 @@ export const SettingsPhotoForm = ({
 
   return (
     <>
-      <div className="flex flex-col items-center gap-2 rounded-md justify-between p-4 lg:flex-row border border-primary/50">
+      <div className="flex flex-col items-center gap-2 rounded-md justify-between p-4 lg:flex-row border">
         <h2 className="text-center text-md font-medium text-slate-400">
           Preview how your profile will look.
         </h2>

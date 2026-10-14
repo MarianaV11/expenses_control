@@ -26,7 +26,7 @@ const SettingsDangerZone = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 border border-b-primary/50 rounded-md p-8 bg-background w-[55%] max-lg:w-[100%] border-b-10">
+    <div className="flex flex-col gap-4 border border-b-muted-foreground/20 rounded-md p-8 bg-background w-[55%] max-lg:w-[100%] border-b-10">
       <h1 className="text-3xl">Danger Zone</h1>
       <p className="text-muted-foreground text-sm">Irreversible actions</p>
       <div className="flex items-center gap-3">

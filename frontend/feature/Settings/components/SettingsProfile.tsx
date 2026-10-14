@@ -48,7 +48,7 @@ const SettingsProfile = () => {
   }, []);
 
   return (
-    <div className="flex flex-col border-t-10 border-t-primary/50 gap-4 border rounded-md p-8 bg-background  w-[55%] max-lg:w-[100%]">
+    <div className="flex flex-col border-t-10 border-t-muted-foreground/20 gap-4 border rounded-md p-8 bg-background  w-[55%] max-lg:w-[100%]">
       <h1 className="text-3xl">Profile</h1>
       <p className="text-muted-foreground text-sm">
         Manage your personal information

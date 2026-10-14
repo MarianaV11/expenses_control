@@ -6,6 +6,6 @@ type ProfileStore = {
 };
 
 export const useProfile = create<ProfileStore>((set) => ({
-  profile: "/default_user.png",
+  profile: "",
   setProfile: (picture) => set({ profile: picture }),
 }));

@@ -59,7 +59,7 @@ const SpendingHistory = () => {
 
   return (
     <>
-      <div className="border p-5 rounded-sm border-t-8 border-primary/50">
+      <div className="border p-5 rounded-sm border-t-8 border-t-muted-foreground/20">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           {monthlySnapshots?.snapshots &&
             monthlySnapshots?.snapshots.map((snapshot: MonthlySnapshot) => (
