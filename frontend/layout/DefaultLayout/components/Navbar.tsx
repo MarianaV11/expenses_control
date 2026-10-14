@@ -1,5 +1,7 @@
 "use client";
 
+import HamburgerButton from "@/components/external/HamburgerButton";
+import SwitchTheme from "@/components/external/SwitchTheme";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -16,7 +18,7 @@ import { useProfile } from "@/store/profile.store";
 import { useUser } from "@/store/user.store";
 import { AxiosError } from "axios";
 import { ChevronDown, Menu, XIcon } from "lucide-react";
-import Image from "next/image";
+import UserAvatar from "@/components/UserAvatar";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useCallback, useEffect } from "react";
 import { shallow } from "zustand/shallow";
@@ -68,14 +70,10 @@ export function Navbar({ expanded, setExpanded }: NavbarProps) {
 
   return (
     <nav className="p-2 border-b sticky top-0 z-50 flex justify-between items-center mb-0">
-      <Button
-        className="rounded-lg cursor-pointer border-zing-400 border bg-card"
-        variant="ghost"
-        onClick={() => setExpanded((current) => !current)}
-      >
-        {expanded ? <XIcon /> : <Menu />}
-      </Button>
-      <div>
+      <HamburgerButton expanded={expanded} setExpanded={setExpanded} />
+
+      <div className="flex items-center gap-2">
+        <SwitchTheme />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -86,15 +84,11 @@ export function Navbar({ expanded, setExpanded }: NavbarProps) {
               [&[data-state=open]_svg]:rotate-180"
             >
               <div className="flex max-md:hidden">
-                <div className="w-11 h-11 relative overflow-hidden rounded-full">
-                  <Image
-                    alt="user_profile"
-                    src={profile}
-                    fill
-                    unoptimized
-                    className="object-cover"
-                  />
-                </div>
+                <UserAvatar
+                  name={user?.name}
+                  src={profile}
+                  className="size-9 text-sm"
+                />
                 {user && (
                   <div className="flex justify-center flex-col ml-3">
                     <h4 className="font-semiboldy">

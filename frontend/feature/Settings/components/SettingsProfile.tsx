@@ -8,7 +8,7 @@ import { useProfile } from "@/store/profile.store";
 import { useUser } from "@/store/user.store";
 import { AxiosError } from "axios";
 import { Calendar, Camera, Mail } from "lucide-react";
-import Image from "next/image";
+import UserAvatar from "@/components/UserAvatar";
 import { useCallback, useState } from "react";
 import { SettingsPhotoForm } from "./forms/SettingsPhotoForm";
 import SettingsProfileInfoForm from "./forms/SettingsProfileInfoForm";
@@ -63,15 +63,11 @@ const SettingsProfile = () => {
           <Camera className="text-primary" />
         </Button>
 
-        <div className="w-30 h-30 relative overflow-hidden rounded-full shadow-md max-sm:mx-auto">
-          <Image
-            alt="user_profile"
-            src={profile}
-            fill
-            unoptimized
-            className="object-cover"
-          />
-        </div>
+        <UserAvatar
+          name={user?.name}
+          src={profile}
+          className="size-20 text-2xl max-sm:mx-auto"
+        />
         <div className="flex gap-2 flex-col ml-3 max-sm:ml-0 max-sm:items-center">
           <h3 className="font-semiboldy text-2xl max-sm:text-sm">
             {user?.name.split(" ").slice(0, 2).join(" ")}
@@ -107,7 +103,7 @@ const SettingsProfile = () => {
         description="Upload a new picture to personalize your profile."
         content={
           <SettingsPhotoForm
-            currentProfile={profile === "/default_user.png" ? null : profile}
+            currentProfile={profile || null}
             getProfile={getUserPicture}
             setOpenForm={setOpenDialog}
           />

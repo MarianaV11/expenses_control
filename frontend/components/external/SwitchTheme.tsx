@@ -1,94 +1,56 @@
-import { useTheme } from "next-themes";
-import styled from "styled-components";
+import { useTheme } from 'next-themes';
+import styled from 'styled-components';
 
 const SwitchTheme = () => {
-  const { theme, setTheme } = useTheme();
-
-  const changeTheme = () => {
-    if (theme === "light") {
-      setTheme("dark");
-    } else {
-      setTheme("light");
-    }
-  };
+  const { resolvedTheme, setTheme } = useTheme();
+  const isSun = resolvedTheme !== 'dark';
 
   return (
     <StyledWrapper>
       <label className="switch">
-        <input id="input" type="checkbox" />
-        <div className="slider round" onClick={() => changeTheme()}>
-          <div className="sun-moon">
-            <svg id="moon-dot-1" className="moon-dot" viewBox="0 0 100 100">
-              <circle cx={50} cy={50} r={50} />
-            </svg>
-            <svg id="moon-dot-2" className="moon-dot" viewBox="0 0 100 100">
-              <circle cx={50} cy={50} r={50} />
-            </svg>
-            <svg id="moon-dot-3" className="moon-dot" viewBox="0 0 100 100">
-              <circle cx={50} cy={50} r={50} />
-            </svg>
-            <svg id="light-ray-1" className="light-ray" viewBox="0 0 100 100">
-              <circle cx={50} cy={50} r={50} />
-            </svg>
-            <svg id="light-ray-2" className="light-ray" viewBox="0 0 100 100">
-              <circle cx={50} cy={50} r={50} />
-            </svg>
-            <svg id="light-ray-3" className="light-ray" viewBox="0 0 100 100">
-              <circle cx={50} cy={50} r={50} />
-            </svg>
-            <svg id="cloud-1" className="cloud-dark" viewBox="0 0 100 100">
-              <circle cx={50} cy={50} r={50} />
-            </svg>
-            <svg id="cloud-2" className="cloud-dark" viewBox="0 0 100 100">
-              <circle cx={50} cy={50} r={50} />
-            </svg>
-            <svg id="cloud-3" className="cloud-dark" viewBox="0 0 100 100">
-              <circle cx={50} cy={50} r={50} />
-            </svg>
-            <svg id="cloud-4" className="cloud-light" viewBox="0 0 100 100">
-              <circle cx={50} cy={50} r={50} />
-            </svg>
-            <svg id="cloud-5" className="cloud-light" viewBox="0 0 100 100">
-              <circle cx={50} cy={50} r={50} />
-            </svg>
-            <svg id="cloud-6" className="cloud-light" viewBox="0 0 100 100">
-              <circle cx={50} cy={50} r={50} />
-            </svg>
-          </div>
-          <div className="stars">
-            <svg id="star-1" className="star" viewBox="0 0 20 20">
-              <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z" />
-            </svg>
-            <svg id="star-2" className="star" viewBox="0 0 20 20">
-              <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z" />
-            </svg>
-            <svg id="star-3" className="star" viewBox="0 0 20 20">
-              <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z" />
-            </svg>
-            <svg id="star-4" className="star" viewBox="0 0 20 20">
-              <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z" />
-            </svg>
-          </div>
-        </div>
+        <input
+          type="checkbox"
+          checked={isSun}
+          onChange={(e) => setTheme(e.target.checked ? 'light' : 'dark')}
+          aria-label="Toggle theme"
+          suppressHydrationWarning
+        />
+        <span className="slider">
+          <div className="star star_1" />
+          <div className="star star_2" />
+          <div className="star star_3" />
+          <svg viewBox="0 0 16 16" className="cloud_1 cloud">
+            <path transform="matrix(.77976 0 0 .78395-299.99-418.63)" fill="#fff" d="m391.84 540.91c-.421-.329-.949-.524-1.523-.524-1.351 0-2.451 1.084-2.485 2.435-1.395.526-2.388 1.88-2.388 3.466 0 1.874 1.385 3.423 3.182 3.667v.034h12.73v-.006c1.775-.104 3.182-1.584 3.182-3.395 0-1.747-1.309-3.186-2.994-3.379.007-.106.011-.214.011-.322 0-2.707-2.271-4.901-5.072-4.901-2.073 0-3.856 1.202-4.643 2.925" />
+          </svg>
+        </span>
       </label>
     </StyledWrapper>
   );
-};
+}
 
 const StyledWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  /* Theme Switch */
+  /* The switch - the box around the slider */
   .switch {
+    font-size: 11px;
     position: relative;
     display: inline-block;
-    width: 60px;
-    height: 34px;
+    width: 4em;
+    height: 2.2em;
+    border-radius: 30px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   }
 
-  .switch #input {
+  /* Hide default HTML checkbox */
+  .switch input {
     opacity: 0;
     width: 0;
     height: 0;
   }
 
+  /* The slider */
   .slider {
     position: absolute;
     cursor: pointer;
@@ -96,258 +58,73 @@ const StyledWrapper = styled.div`
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #2196f3;
-    -webkit-transition: 0.4s;
+    background-color: #2a2a2a;
     transition: 0.4s;
-    z-index: 0;
+    border-radius: 30px;
     overflow: hidden;
   }
 
-  .sun-moon {
+  .slider:before {
     position: absolute;
     content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: yellow;
-    -webkit-transition: 0.4s;
+    height: 1.2em;
+    width: 1.2em;
+    border-radius: 20px;
+    left: 0.5em;
+    bottom: 0.5em;
     transition: 0.4s;
+    transition-timing-function: cubic-bezier(0.81, -0.04, 0.38, 1.5);
+    box-shadow: inset 0.5em -0.25em 0px 0px #fff;
   }
 
-  #input:checked + .slider {
-    background-color: black;
+  .switch input:checked + .slider {
+    background-color: #00a6ff;
   }
 
-  #input:focus + .slider {
-    box-shadow: 0 0 1px #2196f3;
-  }
-
-  #input:checked + .slider .sun-moon {
-    -webkit-transform: translateX(26px);
-    -ms-transform: translateX(26px);
-    transform: translateX(26px);
-    background-color: white;
-    -webkit-animation: rotate-center 0.6s ease-in-out both;
-    animation: rotate-center 0.6s ease-in-out both;
-  }
-
-  .moon-dot {
-    opacity: 0;
-    transition: 0.4s;
-    fill: gray;
-  }
-
-  #input:checked + .slider .sun-moon .moon-dot {
-    opacity: 1;
-  }
-
-  .slider.round {
-    border-radius: 34px;
-  }
-
-  .slider.round .sun-moon {
-    border-radius: 50%;
-  }
-
-  #moon-dot-1 {
-    left: 10px;
-    top: 3px;
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    z-index: 4;
-  }
-
-  #moon-dot-2 {
-    left: 2px;
-    top: 10px;
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    z-index: 4;
-  }
-
-  #moon-dot-3 {
-    left: 16px;
-    top: 18px;
-    position: absolute;
-    width: 3px;
-    height: 3px;
-    z-index: 4;
-  }
-
-  #light-ray-1 {
-    left: -8px;
-    top: -8px;
-    position: absolute;
-    width: 43px;
-    height: 43px;
-    z-index: -1;
-    fill: white;
-    opacity: 10%;
-  }
-
-  #light-ray-2 {
-    left: -50%;
-    top: -50%;
-    position: absolute;
-    width: 55px;
-    height: 55px;
-    z-index: -1;
-    fill: white;
-    opacity: 10%;
-  }
-
-  #light-ray-3 {
-    left: -18px;
-    top: -18px;
-    position: absolute;
-    width: 60px;
-    height: 60px;
-    z-index: -1;
-    fill: white;
-    opacity: 10%;
-  }
-
-  .cloud-light {
-    position: absolute;
-    fill: #eee;
-    animation-name: cloud-move;
-    animation-duration: 6s;
-    animation-iteration-count: infinite;
-  }
-
-  .cloud-dark {
-    position: absolute;
-    fill: #ccc;
-    animation-name: cloud-move;
-    animation-duration: 6s;
-    animation-iteration-count: infinite;
-    animation-delay: 1s;
-  }
-
-  #cloud-1 {
-    left: 30px;
-    top: 15px;
-    width: 40px;
-  }
-
-  #cloud-2 {
-    left: 44px;
-    top: 10px;
-    width: 20px;
-  }
-
-  #cloud-3 {
-    left: 18px;
-    top: 24px;
-    width: 30px;
-  }
-
-  #cloud-4 {
-    left: 36px;
-    top: 18px;
-    width: 40px;
-  }
-
-  #cloud-5 {
-    left: 48px;
-    top: 14px;
-    width: 20px;
-  }
-
-  #cloud-6 {
-    left: 22px;
-    top: 26px;
-    width: 30px;
-  }
-
-  @keyframes cloud-move {
-    0% {
-      transform: translateX(0px);
-    }
-
-    40% {
-      transform: translateX(4px);
-    }
-
-    80% {
-      transform: translateX(-4px);
-    }
-
-    100% {
-      transform: translateX(0px);
-    }
-  }
-
-  .stars {
-    transform: translateY(-32px);
-    opacity: 0;
-    transition: 0.4s;
+  .switch input:checked + .slider:before {
+    transform: translateX(1.8em);
+    box-shadow: inset 0.9em -0.25em 0px 0.9em #ffcf48;
   }
 
   .star {
-    fill: white;
+    background-color: #fff;
+    border-radius: 50%;
     position: absolute;
-    -webkit-transition: 0.4s;
-    transition: 0.4s;
-    animation-name: star-twinkle;
-    animation-duration: 2s;
-    animation-iteration-count: infinite;
+    width: 2px;
+    transition: all 0.4s;
+    height: 2px;
   }
 
-  #input:checked + .slider .stars {
-    -webkit-transform: translateY(0);
-    -ms-transform: translateY(0);
-    transform: translateY(0);
+  .star_1 {
+    left: 2.5em;
+    top: 0.5em;
+  }
+
+  .star_2 {
+    left: 2.2em;
+    top: 1.2em;
+  }
+
+  .star_3 {
+    left: 3em;
+    top: 0.9em;
+  }
+
+  .switch input:checked ~ .slider .star {
+    opacity: 0;
+  }
+
+  .cloud {
+    width: 3.5em;
+    position: absolute;
+    bottom: -1.4em;
+    left: -1.1em;
+    opacity: 0;
+    transition: all 0.4s;
+  }
+
+  .switch input:checked ~ .slider .cloud {
     opacity: 1;
-  }
-
-  #star-1 {
-    width: 20px;
-    top: 2px;
-    left: 3px;
-    animation-delay: 0.3s;
-  }
-
-  #star-2 {
-    width: 6px;
-    top: 16px;
-    left: 3px;
-  }
-
-  #star-3 {
-    width: 12px;
-    top: 20px;
-    left: 10px;
-    animation-delay: 0.6s;
-  }
-
-  #star-4 {
-    width: 18px;
-    top: 0px;
-    left: 18px;
-    animation-delay: 1.3s;
-  }
-
-  @keyframes star-twinkle {
-    0% {
-      transform: scale(1);
-    }
-
-    40% {
-      transform: scale(1.2);
-    }
-
-    80% {
-      transform: scale(0.8);
-    }
-
-    100% {
-      transform: scale(1);
-    }
-  }
-`;
+  }`;
 
 export default SwitchTheme;
