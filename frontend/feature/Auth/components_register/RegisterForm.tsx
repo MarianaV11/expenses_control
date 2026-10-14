@@ -68,7 +68,11 @@ const RegisterForm = () => {
       const onError = (error: AxiosError) => {
         const data = error.response?.data as { message?: string };
 
-        showToast({ message: data?.message ?? String(error), type: "error" });
+        if (error?.status === 409) {
+          showToast({ message: "Already has a user register with this e-mail.", type: "error" });
+        } else {
+          showToast({ message: data?.message ?? String(error), type: "error" });
+        }
       };
 
       const body: UserCreate = {
