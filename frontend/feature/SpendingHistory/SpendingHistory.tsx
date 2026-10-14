@@ -112,10 +112,13 @@ const SpendingHistory = () => {
 
       {currentSnapshot && (
         <CommonDialog
-          title="Metrics of Month"
+          title={new Date(
+            `${currentSnapshot.year_month}-01T00:00:00`,
+          ).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+          description="Where your money went this month."
           open={openDialog}
           setOpen={setOpenDialog}
-          className="w-fit min-h-[80dvh] max-h-[100dvh] max-w-none overflow-scroll overflow-x-hidden"
+          className="w-[calc(100%-2rem)] sm:max-w-4xl max-h-[90dvh] overflow-y-auto"
           content={
             <SpendingHistoryMetrics
               onCloseModal={setOpenDialog}

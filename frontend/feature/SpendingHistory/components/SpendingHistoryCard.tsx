@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/utils/currency";
 import { TrendingDown, TrendingUp } from "lucide-react";
 
@@ -20,74 +21,96 @@ const SpendingHistoryCard = ({
   onClick,
 }: SpendingHistoryCardProps) => {
   const totalRemaining = currentRevenue - totalSpent;
+  const isOverBudget = totalSpent >= currentRevenue;
   const spentPercentage =
     currentRevenue > 0 ? (totalSpent / currentRevenue) * 100 : 0;
+
+  const [year, month] = yearMonth.split("-").map(Number);
+  const monthName = new Date(year, month - 1).toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
+  const now = new Date();
+  const isCurrentMonth =
+    year === now.getFullYear() && month === now.getMonth() + 1;
+
+  const topLabels = Object.entries(totalByLabel ?? {})
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 3);
 
   return (
     <Card
       onClick={onClick}
-      className="relative hover:scale-105 hover:shadow-2xl cursor-pointer transform transition-transform ease-in-out duration-300"
+      className="cursor-pointer gap-4 transition-shadow duration-300 hover:shadow-lg border-t-4 border-t-muted-foreground/20"
     >
-      <div className="bg-gradient-to-r from-[var(--primary)]/50 via-purple-600 to-[var(--secondary)] h-3 w-full rounded-t-lg absolute top-0"></div>
-      <CardHeader className="flex justify-between max-sm:flex-col max-sm:items-center">
-        <CardTitle>{yearMonth.replace("-", "/")}</CardTitle>
-        {totalSpent >= currentRevenue ? (
-          <Badge variant="destructive">
-            <TrendingDown />
-            {formatCurrency(totalRemaining)}
-          </Badge>
-        ) : (
-          <Badge variant="success">
-            <TrendingUp />
-            {formatCurrency(totalRemaining)}
-          </Badge>
-        )}
+      <CardHeader className="flex items-start justify-between gap-2">
+        <div>
+          <CardTitle className="text-lg">{monthName}</CardTitle>
+          {isCurrentMonth && (
+            <span className="text-xs text-muted-foreground">Current month</span>
+          )}
+        </div>
+        <Badge variant={isOverBudget ? "destructive" : "success"}>
+          {isOverBudget ? <TrendingDown /> : <TrendingUp />}
+          {formatCurrency(totalRemaining)}
+        </Badge>
       </CardHeader>
-      <CardContent>
-        <div className="flex gap-10 max-sm:flex-col max-sm:gap-1">
+
+      <CardContent className="flex flex-col gap-5">
+        <div className="grid grid-cols-2 gap-4">
           <div>
-            <p className="text-sm font-light">Revenue</p>
-            <p className="text-success font-bold">
+            <p className="text-xs text-muted-foreground">Revenue</p>
+            <p className="font-semibold tabular-nums">
               {formatCurrency(currentRevenue)}
             </p>
           </div>
           <div>
-            <p className="text-sm font-light">Spent</p>
-            <p className="text-destructive font-bold">
+            <p className="text-xs text-muted-foreground">Spent</p>
+            <p className="font-semibold tabular-nums text-destructive">
               {formatCurrency(totalSpent)}
             </p>
           </div>
         </div>
-        <div className="relative">
-          <p className="text-sm font-light">Revenue Expenditure</p>
+
+        <div>
+          <div className="flex justify-between text-xs text-muted-foreground mb-1">
+            <span>Revenue spent</span>
+            <span
+              className={cn(
+                "tabular-nums",
+                isOverBudget && "text-destructive font-medium",
+              )}
+            >
+              {spentPercentage.toFixed(0)}%
+            </span>
+          </div>
           <Progress
-            className="w-full"
-            value={spentPercentage}
+            value={Math.min(spentPercentage, 100)}
+            className={cn(isOverBudget && "[&>div]:bg-destructive")}
           />
-          <p className="text-sm font-light absolute top-0 right-0 max-sm:hidden">
-            {spentPercentage.toFixed(2)}%
-          </p>
         </div>
-        <div className="mt-4">
-          <p className="font-light">By category</p>
-          {totalByLabel &&
-            Object.entries(totalByLabel)
-              .slice(0, 3)
-              .map(([label, value], index) => (
-                <div key={index}>
-                  <p className="font-light text-sm">{label}</p>
-                  <div className="flex gap-1 items-center">
-                    <Progress
-                      className="w-full"
-                      value={(value / totalSpent) * 100}
-                    />
-                    <p className="text-sm font-medium max-sm:hidden">
-                      {formatCurrency(value)}
-                    </p>
-                  </div>
+
+        {topLabels.length > 0 && (
+          <div className="border-t pt-4 flex flex-col gap-3">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              Top categories
+            </p>
+            {topLabels.map(([label, value]) => (
+              <div key={label}>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="truncate">{label}</span>
+                  <span className="tabular-nums text-muted-foreground">
+                    {formatCurrency(value)}
+                  </span>
                 </div>
-              ))}
-        </div>
+                <Progress
+                  className="h-1.5"
+                  value={totalSpent > 0 ? (value / totalSpent) * 100 : 0}
+                />
+              </div>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );

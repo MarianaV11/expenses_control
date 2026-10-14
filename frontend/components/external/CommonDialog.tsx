@@ -25,7 +25,7 @@ const CommonDialog = ({
   open = false,
 }: CommonDialogProps) => {
   return (
-    <Dialog open={open}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className={`${className}`}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>

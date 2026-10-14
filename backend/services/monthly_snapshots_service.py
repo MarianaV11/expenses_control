@@ -75,12 +75,17 @@ def calculate_month_metrics(
 def get_monthly_snapshots(
     user_id: int, page: int, per_page: int, db: Session
 ) -> MonthlySnapshotsList:
+    today = date.today()
+    end_of_current_month = date(
+        today.year, today.month, calendar.monthrange(today.year, today.month)[1]
+    )
     year = func.extract("year", Expense.day)
     month = func.extract("month", Expense.day)
     try:
         months = (
             db.query(year, month)
             .filter(Expense.user_id == user_id)
+            .filter(Expense.day <= end_of_current_month)
             .group_by(year, month)
             .order_by(year.desc(), month.desc())
             .all()

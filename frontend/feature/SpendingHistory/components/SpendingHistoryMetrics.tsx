@@ -1,23 +1,23 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
-import { axios } from "@/service/axios_config";
 import { MonthlySnapshot } from "@/types/monthly_snapshots";
-import { AxiosResponse } from "axios";
-import { Plus } from "lucide-react";
-import { Dispatch, SetStateAction, useMemo, useState } from "react";
+import { formatCurrency } from "@/utils/currency";
+import { Dispatch, ReactNode, SetStateAction, useMemo } from "react";
 import {
   Bar,
   BarChart,
   CartesianGrid,
-  LabelList,
+  Cell,
   Pie,
   PieChart,
-  ResponsiveContainer,
-  Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
@@ -29,172 +29,217 @@ interface SpendingHistoryMetricsProps {
 
 const chartConfig = {
   value: {
-    label: "Value Spent",
+    label: "Spent",
   },
 } satisfies ChartConfig;
+
+const COLORS = [1, 2, 3, 4, 5].map((n) => `var(--chart-${n})`);
+
+const toChartData = (totals: Record<string, number> | undefined) =>
+  Object.entries(totals ?? {})
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => b.value - a.value);
+
+const compactCurrency = (value: number) =>
+  new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    notation: "compact",
+  }).format(value);
+
+const tooltip = (
+  <ChartTooltip
+    cursor={{ fill: "var(--muted)" }}
+    content={
+      <ChartTooltipContent
+        formatter={(value, name) => (
+          <div className="flex w-full justify-between gap-4">
+            <span className="text-muted-foreground">{name}</span>
+            <span className="font-medium tabular-nums">
+              {formatCurrency(Number(value))}
+            </span>
+          </div>
+        )}
+      />
+    }
+  />
+);
+
+const Section = ({
+  title,
+  className,
+  children,
+}: {
+  title: string;
+  className?: string;
+  children: ReactNode;
+}) => (
+  <div
+    className={cn(
+      "border-t-10 border-t-muted-foreground/20 rounded-md border p-4",
+      className,
+    )}
+  >
+    <h2 className="font-medium mb-4">{title}</h2>
+    {children}
+  </div>
+);
 
 const SpendingHistoryMetrics = ({
   monthSnapshot,
   onCloseModal,
 }: SpendingHistoryMetricsProps) => {
-  const chartDataPaymentType = useMemo(
-    () =>
-      Object.entries(monthSnapshot.total_by_payment_type ?? {}).map(
-        ([label, value]) => ({
-          paymentType: label,
-          value,
-        }),
-      ),
-    [monthSnapshot.total_by_payment_type],
-  );
-
-  const chartDataCardType = useMemo(
-    () =>
-      Object.entries(monthSnapshot.total_by_card ?? {}).map(
-        ([card, value]) => ({
-          cardType: card,
-          value,
-        }),
-      ),
+  const byCard = useMemo(
+    () => toChartData(monthSnapshot.total_by_card),
     [monthSnapshot.total_by_card],
   );
-
-  const chartDataLabelType = useMemo(
-    () =>
-      Object.entries(monthSnapshot.total_by_label ?? {}).map(
-        ([label, value]) => ({
-          label: label,
-          value,
-        }),
-      ),
+  const byPaymentType = useMemo(
+    () => toChartData(monthSnapshot.total_by_payment_type),
+    [monthSnapshot.total_by_payment_type],
+  );
+  const byLabel = useMemo(
+    () => toChartData(monthSnapshot.total_by_label),
     [monthSnapshot.total_by_label],
   );
 
   const remainingValue =
     monthSnapshot.current_revenue - monthSnapshot.total_spent;
 
+  const summary = [
+    { title: "Revenue", value: monthSnapshot.current_revenue },
+    {
+      title: "Total Spent",
+      value: monthSnapshot.total_spent,
+      className: "text-destructive",
+    },
+    {
+      title: "Remaining",
+      value: remainingValue,
+      className: remainingValue >= 0 ? "text-success" : "text-destructive",
+    },
+  ];
+
   return (
-    <div>
-      <div className="grid grid-cols-3 gap-2 mb-4 max-md:grid-cols-1 max-md:gap-4">
-        <div className="text-lg border border-t-muted-foreground/20 border-t-4 p-2 text-center font-bold rounded-md">
-          <p className="text-sm text-muted-foreground font-light">
-            Current Revenue
-          </p>
-          {new Intl.NumberFormat("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-          }).format(monthSnapshot.current_revenue)}
-        </div>
-        <div className="text-lg border p-2 border-t-muted-foreground/20 border-t-4 text-center font-bold rounded-md">
-          <p className="text-sm text-muted-foreground font-light">
-            Total Spent
-          </p>
-          {new Intl.NumberFormat("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-          }).format(monthSnapshot.total_spent)}
-        </div>
-        <div className="text-lg border p-2 border-t-muted-foreground/20 border-t-4 text-center font-bold rounded-md">
-          <p className="text-sm text-muted-foreground font-light">
-            Remaining Value
-          </p>
-          {new Intl.NumberFormat("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-          }).format(remainingValue)}
-        </div>
+    <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-3 gap-3 max-md:grid-cols-1">
+        {summary.map(({ title, value, className }) => (
+          <div
+            key={title}
+            className="border border-t-4 border-t-muted-foreground/20 rounded-md p-3"
+          >
+            <p className="text-xs text-muted-foreground">{title}</p>
+            <p
+              className={cn("text-xl font-bold tabular-nums mt-1", className)}
+            >
+              {formatCurrency(value)}
+            </p>
+          </div>
+        ))}
       </div>
-      <div className="flex justify-center items-center gap-2 mb-4 max-md:flex-col">
-        <div className="border-t-10 border-t-muted-foreground/20 rounded-md border p-2 flex-1">
-          <h2 className="font-medium m-4">Card Type</h2>
-          <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartDataCardType}>
-                <XAxis dataKey="cardType" type="category" />
-                <YAxis type="number" />
-                <Tooltip />
-                <Bar
-                  dataKey="value"
-                  fill="var(--chart-1)"
-                  radius={[6, 6, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
+
+      <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
+        <Section title="By Card">
+          <ChartContainer config={chartConfig} className="h-[260px] w-full">
+            <BarChart data={byCard} margin={{ left: 8 }}>
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="name"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+              />
+              <YAxis
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={compactCurrency}
+                width={70}
+              />
+              {tooltip}
+              <Bar dataKey="value" fill="var(--chart-1)" radius={[6, 6, 0, 0]} />
+            </BarChart>
           </ChartContainer>
-        </div>
-        <div className="border-t-10 border-t-muted-foreground/20 rounded-md border p-2 flex-1">
-          <h2 className="font-medium m-4">Payment Type</h2>
-          <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartDataPaymentType} layout="vertical">
-                <XAxis type="number" />
-                <YAxis dataKey="paymentType" type="category" />
-                <Tooltip />
-                <CartesianGrid vertical={false} />
-                <Bar
-                  dataKey="value"
-                  fill="var(--chart-2)"
-                  radius={[0, 6, 6, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
+        </Section>
+
+        <Section title="By Payment Type">
+          <ChartContainer config={chartConfig} className="h-[260px] w-full">
+            <BarChart data={byPaymentType} layout="vertical" margin={{ left: 8 }}>
+              <CartesianGrid horizontal={false} />
+              <XAxis
+                type="number"
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={compactCurrency}
+              />
+              <YAxis
+                dataKey="name"
+                type="category"
+                tickLine={false}
+                axisLine={false}
+                width={90}
+              />
+              {tooltip}
+              <Bar dataKey="value" fill="var(--chart-2)" radius={[0, 6, 6, 0]} />
+            </BarChart>
           </ChartContainer>
-        </div>
+        </Section>
       </div>
-      <div className="border-t-10 border-t-muted-foreground/20 border p-2 rounded-2xl flex max-md:flex-col">
-        <div className="flex-1">
-          <h2 className="font-medium ml-4">Label Type</h2>
-          <ChartContainer config={chartConfig}>
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart data={chartDataPaymentType}>
-                <Tooltip />
+
+      <Section title="By Label">
+        {byLabel.length ? (
+          <div className="flex items-center gap-6 max-md:flex-col">
+            <ChartContainer
+              config={chartConfig}
+              className="h-[220px] w-[220px] shrink-0"
+            >
+              <PieChart>
+                {tooltip}
                 <Pie
-                  data={chartDataLabelType}
+                  data={byLabel}
                   dataKey="value"
-                  nameKey="label"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius="50%"
-                  fill="#926ef5"
-                />
-                <Pie
-                  data={chartDataLabelType}
-                  dataKey="value"
-                  nameKey="label"
-                  cx="50%"
-                  cy="50%"
+                  nameKey="name"
                   innerRadius="60%"
-                  outerRadius="80%"
-                  fill="#4300ff"
-                  label
-                />
-                <LabelList
-                  fill="black"
-                  position="center"
-                  valueAccessor={() => "center"}
-                />
+                  outerRadius="90%"
+                  paddingAngle={2}
+                  stroke="var(--card)"
+                >
+                  {byLabel.map((entry, index) => (
+                    <Cell
+                      key={entry.name}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                </Pie>
               </PieChart>
-            </ResponsiveContainer>
-          </ChartContainer>
-        </div>
-        <div className="border flex flex-col overflow-y-scroll rounded-md p-4 max-h-100">
-          <h2 className="font-medium mb-2">Percentage</h2>
-          {monthSnapshot.percentage_by_label &&
-            Object.entries(monthSnapshot.percentage_by_label).map(
-              ([label, percentage], index) => (
-                <Badge key={index} variant="outline" className="mb-2">
-                  {label}: {percentage}%
-                </Badge>
-              ),
-            )}
-        </div>
-      </div>
-      <div className="w-full flex justify-end mt-4">
-        <Button
-          onClick={() => onCloseModal(false)}
-          variant="outline"
-          className="w-20"
-        >
+            </ChartContainer>
+
+            <ul className="flex-1 w-full flex flex-col gap-2 max-h-[220px] overflow-y-auto">
+              {byLabel.map(({ name, value }, index) => (
+                <li key={name} className="flex items-center gap-3 text-sm">
+                  <span
+                    className="size-3 shrink-0 rounded-full"
+                    style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                  />
+                  <span className="flex-1 truncate">{name}</span>
+                  <span className="tabular-nums text-muted-foreground">
+                    {formatCurrency(value)}
+                  </span>
+                  <span className="tabular-nums font-medium w-14 text-right">
+                    {(monthSnapshot.percentage_by_label?.[name] ?? 0).toFixed(
+                      1,
+                    )}
+                    %
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">No expenses this month.</p>
+        )}
+      </Section>
+
+      <div className="flex justify-end">
+        <Button onClick={() => onCloseModal(false)} variant="outline">
           Close
         </Button>
       </div>
