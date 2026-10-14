@@ -1,19 +1,19 @@
 const Background = () => {
   const waves = [
     {
-      opacity: 0.3,
+      opacity: 0.08,
       dur: "10s",
       values: "270 230; -334 180; 270 230",
       keyTimes: "0; .5; 1",
     },
     {
-      opacity: 0.6,
+      opacity: 0.14,
       dur: "8s",
       values: "-270 230;243 220;-270 230",
       keyTimes: "0; .6; 1",
     },
     {
-      opacity: 0.9,
+      opacity: 0.22,
       dur: "10s",
       values: "0 230;-140 200;0 230",
       keyTimes: "0; .4; 1",
@@ -29,9 +29,9 @@ const Background = () => {
     >
       <defs>
         <linearGradient id="bg">
-          <stop offset="0%" stopColor="#878787" />
-          <stop offset="50%" stopColor="#bab8b8" />
-          <stop offset="100%" stopColor="#878787" />
+          <stop offset="0%" stopColor="var(--primary)" />
+          <stop offset="50%" stopColor="var(--secondary)" />
+          <stop offset="100%" stopColor="var(--primary)" />
         </linearGradient>
 
         <path

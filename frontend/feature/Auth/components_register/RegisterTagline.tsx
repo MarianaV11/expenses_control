@@ -7,7 +7,7 @@ interface RegisterTaglineProps {
 const RegisterTagline = ({ onRegisterClick }: RegisterTaglineProps) => {
   return (
     <div className="text-center max-md:hidden">
-      <h1 className="text-6xl font-extrabold mb-5 text-[#4300FF]">
+      <h1 className="text-6xl font-extrabold mb-5 bg-gradient-to-r from-[#1e3a8a] to-[#60a5fa] dark:from-white dark:to-[#bfdbfe] bg-clip-text text-transparent">
         Register Now!
       </h1>
       <p className="text-2xl">Start your journey to financial freedom today.</p>
